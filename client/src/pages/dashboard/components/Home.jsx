@@ -5,10 +5,10 @@ export default function Home() {
   return (
     <div className="home-container">
       <div className="filter-container">
-        <p className="--chip">DOS is For You!</p>
-        <p className="--chip">General</p>
-        <p className="--chip">PUP</p>
-        <p className="--chip">Rant</p>
+        <span className="--chip">DOS is For You!</span>
+        <span className="--chip">General</span>
+        <span className="--chip">PUP</span>
+        <span className="--chip">Rant</span>
       </div>
       <div className="post-container">
         <div className="create-post">

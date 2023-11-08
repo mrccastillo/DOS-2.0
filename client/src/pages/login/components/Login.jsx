@@ -3,14 +3,18 @@ import { Navigate } from "react-router-dom";
 import "../stylesheets/Login.css";
 
 export default function Login() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInSignInPage, setIsInSignInPage] = useState(true);
   const [steps, setSteps] = useState(0);
+  const [errorMsg, setErrorMsg] = useState("");
 
   //controlled elements
+  const [usernameOrEmail, setUsernameOrEmail] = useState("");
+  const [isRememberMe, setIsRememberMe] = useState(false);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
   const [firstName, setFisrtName] = useState("");
   const [lastName, setLastName] = useState("");
   const [section, setSection] = useState("");
@@ -19,6 +23,23 @@ export default function Login() {
   function handleSignUpSubmit(e) {
     e.preventDefault();
     if (steps < 2) {
+      console.log(steps);
+      setErrorMsg("");
+      //don't proceed to next step when form is not filled out
+      if (steps === 0 && (!email || !username || password !== confirmPass)) {
+        if (password !== confirmPass)
+          setErrorMsg("Please confirm your password");
+        else setErrorMsg("Please fill out the fields");
+        return;
+      }
+      if (steps === 1 && (!firstName || !lastName || !section)) {
+        setErrorMsg("Please fill out the fields");
+        return;
+      }
+      if (steps >= 2 && !code) {
+        setErrorMsg("Please fill out the fields");
+        return;
+      }
       setSteps((prevStep) => prevStep + 1);
     } else {
       //dito
@@ -30,14 +51,33 @@ export default function Login() {
       console.log("section: ", section);
       console.log("code: ", code);
       console.log("ACCOUNT CREATED!");
+      setSteps(0);
+      setEmail("");
+      setUsername("");
+      setPassword("");
+      setConfirmPass("");
+      setFisrtName("");
+      setLastName("");
+      setSection("");
+      setCode("");
+      setErrorMsg("");
     }
   }
 
   function handleLogInSubmit(e) {
     e.preventDefault();
-    console.log("email:", email);
+    if (!usernameOrEmail || !password) {
+      setErrorMsg("Please fill out the fields");
+      return;
+    }
+    console.log("username/email:", usernameOrEmail);
     console.log("password:", password);
+    console.log("isRememberMe:", isRememberMe);
     console.log("LOGGED IN");
+    setUsernameOrEmail("");
+    setPassword("");
+    setIsRememberMe();
+    setErrorMsg("");
   }
 
   if (isLoggedIn) {
@@ -68,21 +108,7 @@ export default function Login() {
                 </p>
                 {steps === 0 ? (
                   <>
-                    <input
-                      type="text"
-                      className="login-input --white-btn"
-                      style={{
-                        borderColor: "#4f709c",
-                        backgroundColor: "white",
-                        color: "#000",
-                      }}
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                      }}
-                      placeholder="Enter your email "
-                    />
-                    {!isInSignInPage && (
+                    {isInSignInPage && (
                       <input
                         type="text"
                         className="login-input --white-btn"
@@ -91,12 +117,44 @@ export default function Login() {
                           backgroundColor: "white",
                           color: "#000",
                         }}
-                        value={username}
+                        value={usernameOrEmail}
                         onChange={(e) => {
-                          setUsername(e.target.value);
+                          setUsernameOrEmail(e.target.value);
                         }}
-                        placeholder="Enter your username  "
+                        placeholder="Enter your username or email "
                       />
+                    )}
+                    {!isInSignInPage && (
+                      <>
+                        <input
+                          type="text"
+                          className="login-input --white-btn"
+                          style={{
+                            borderColor: "#4f709c",
+                            backgroundColor: "white",
+                            color: "#000",
+                          }}
+                          value={email}
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                          }}
+                          placeholder="Enter your email "
+                        />
+                        <input
+                          type="text"
+                          className="login-input --white-btn"
+                          style={{
+                            borderColor: "#4f709c",
+                            backgroundColor: "white",
+                            color: "#000",
+                          }}
+                          value={username}
+                          onChange={(e) => {
+                            setUsername(e.target.value);
+                          }}
+                          placeholder="Enter your username  "
+                        />
+                      </>
                     )}
                     <input
                       type="password"
@@ -109,9 +167,33 @@ export default function Login() {
                       value={password}
                       onChange={(e) => {
                         setPassword(e.target.value);
+                        if (!isInSignInPage) {
+                          if (e.target.value != confirmPass)
+                            setErrorMsg("Password didn't match");
+                          else setErrorMsg("");
+                        }
                       }}
                       placeholder="Enter your password"
                     />
+                    {!isInSignInPage && (
+                      <input
+                        type="text"
+                        className="login-input --white-btn"
+                        style={{
+                          borderColor: "#4f709c",
+                          backgroundColor: "white",
+                          color: "#000",
+                        }}
+                        value={confirmPass}
+                        onChange={(e) => {
+                          setConfirmPass(e.target.value);
+                          if (e.target.value != password)
+                            setErrorMsg("Password didn't match");
+                          else setErrorMsg("");
+                        }}
+                        placeholder="Confirm Password  "
+                      />
+                    )}
                   </>
                 ) : steps === 1 ? (
                   <>
@@ -194,6 +276,10 @@ export default function Login() {
                           type="checkbox"
                           name="isRememberMe"
                           id="remember-me"
+                          value={isRememberMe}
+                          onChange={(e) => {
+                            setIsRememberMe(e.target.checked);
+                          }}
                         />
                         <label htmlFor="remember-me">Remember Me</label>
                       </div>
@@ -201,6 +287,7 @@ export default function Login() {
                     </>
                   )}
                 </div>
+                <p className="--server-msg">{errorMsg}</p>
               </div>
               {isInSignInPage ? (
                 <button className="--blue-btn" onClick={handleLogInSubmit}>
@@ -246,6 +333,14 @@ export default function Login() {
                 onClick={() => {
                   setIsInSignInPage(!isInSignInPage);
                   setSteps(0);
+                  setEmail("");
+                  setUsername("");
+                  setPassword("");
+                  setFisrtName("");
+                  setLastName("");
+                  setSection("");
+                  setCode("");
+                  setErrorMsg("");
                 }}
               >
                 {isInSignInPage

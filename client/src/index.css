@@ -7,15 +7,11 @@
 
 ::-webkit-scrollbar {
   width: 5px;
-}
-
-::-webkit-scrollbar-track {
-  background: #4f709c1f;
-  border-radius: 1rem;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #213555;
+  background: #d1d1d1;
   border-radius: 1rem;
 }
 
@@ -25,10 +21,27 @@
 
 .--chip {
   padding: 0.5rem 4rem;
+  min-width: 10rem;
   background-color: #213555;
   border-radius: 2rem;
   color: #fff;
   font-weight: 500;
+  white-space: nowrap;
+  margin-right: 1rem;
+}
+
+.--announce-btn {
+  margin-right: 0;
+}
+
+.--announce {
+  border: 0;
+  padding: 0 1rem;
+}
+
+.--server-msg {
+  color: red;
+  font-size: 0.8rem;
 }
 
 .profile-pic {
