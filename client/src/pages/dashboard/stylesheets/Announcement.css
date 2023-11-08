@@ -1,0 +1,12 @@
+.announcement-container {
+  height: 100%;
+  width: 35%;
+  padding: 0 1rem 2rem 1rem;
+}
+
+.announcement-tab {
+  height: 100%;
+  width: 100%;
+  background-color: #4f709c1f;
+  border-radius: 1rem;
+}

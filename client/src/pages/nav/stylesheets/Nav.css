@@ -1,0 +1,16 @@
+.nav {
+  display: inline-block;
+  width: 11rem;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.nav-content-container {
+  height: 100%;
+  width: 100%;
+  background-color: #e6d283;
+  border-radius: 2rem;
+}
