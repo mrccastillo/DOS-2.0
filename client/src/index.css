@@ -51,9 +51,20 @@ button {
 .profile-pic {
   height: 2.5rem;
   width: 2.5rem;
-  border-radius: calc(2.5rem / 2);
+  border-radius: 50%;
   background-color: #0cc0df;
   margin-right: 1rem;
+}
+
+.--userprofile-pic {
+  position: absolute;
+  left: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 9rem;
+  width: 9rem;
+  border: 5px solid rgb(255, 255, 255);
+  border-radius: 50%;
 }
 
 .username {

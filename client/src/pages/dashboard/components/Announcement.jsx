@@ -1,8 +1,33 @@
-import Post from "../../../reusable-components/post/Post";
+import { useEffect, useState } from "react";
 import Announce from "../../../reusable-components/announcement/Announce";
 import "../stylesheets/Announcement.css";
+import axios from "axios";
 
 export default function Announcements() {
+  const [announcements, setAnnouncements] = useState([]);
+
+  const fetchPosts = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const announcement = await axios.get(
+        "https://backend.dosshs.online/api/announcement",
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+
+      setAnnouncements(announcement.data);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
   return (
     <div className="announcement-container">
       <div className="announcement-tab">
@@ -14,14 +39,17 @@ export default function Announcements() {
         </div>
         <div className="announcements">
           <div className="create-announcement">
-            <button className="post-btn">Create Announcement</button>
+            <button className="post-btn">Make an Announcement</button>
           </div>
           <div className="announcement-list">
-            <Announce />
-            <Announce />
-            <Announce />
-            <Announce />
-            <Announce />
+            {announcements.map((el) => (
+              <Announce
+                key={el._id}
+                fullname={el.fullname}
+                username={el.username}
+                content={el.content}
+              />
+            ))}
           </div>
         </div>
       </div>

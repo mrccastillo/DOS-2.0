@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import "../stylesheets/Login.css";
+import axios from "axios";
 
 export default function Login() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -64,16 +65,29 @@ export default function Login() {
     }
   }
 
-  function handleLogInSubmit(e) {
+  async function handleLogInSubmit(e) {
     e.preventDefault();
     if (!usernameOrEmail || !password) {
       setErrorMsg("Please fill out the fields");
       return;
     }
-    console.log("username/email:", usernameOrEmail);
-    console.log("password:", password);
-    console.log("isRememberMe:", isRememberMe);
-    console.log("LOGGED IN");
+
+    const user = {
+      emailOrUsername: usernameOrEmail,
+      password: password,
+    };
+
+    try {
+      const res = await axios.post(
+        "https://backend.dosshs.online/api/auth/login",
+        user
+      );
+      localStorage.setItem("token", res.data.token);
+      setIsLoggedIn(true);
+    } catch (err) {
+      return setErrorMsg(err.response.data.message);
+      // console.log(err.response.data.message);
+    }
     setUsernameOrEmail("");
     setPassword("");
     setIsRememberMe();

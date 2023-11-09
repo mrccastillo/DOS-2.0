@@ -1,4 +1,4 @@
-export default function Announce() {
+export default function Announce({ fullname, username, content }) {
   return (
     <div className="post">
       <div className="post-content-container">
@@ -6,19 +6,14 @@ export default function Announce() {
           <div className="post-author-info">
             <div className="profile-pic"></div>
             <div className="post-author">
-              <p className="display-name">Juan Dela Cruz</p>
-              <p className="username">@user_name</p>
+              <p className="display-name">{fullname}</p>
+              <p className="username">@{username}</p>
             </div>
           </div>
           <div className="report-post-container"></div>
         </div>
         <div className="post-content --announce">
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus ex
-            cumque ut suscipit officiis aut qui vitae doloremque. Tempore error
-            illo, atque velit nostrum mollitia. Distinctio quae inventore quod
-            sunt!
-          </p>
+          <p>{content}</p>
         </div>
       </div>
       <div className="post-interaction">{/* like and comment container */}</div>
