@@ -10,7 +10,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={token ? <Dashboard /> : <Login />}></Route>
-        <Route path="/dashboard" element={token ? <Dashboard /> : <Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route
           path="/userprofile"
           element={token ? <Userprofile /> : <Login />}

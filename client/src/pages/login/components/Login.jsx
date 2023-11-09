@@ -82,7 +82,6 @@ export default function Login() {
         "https://backend.dosshs.online/api/auth/login",
         user
       );
-      console.log(res);
       localStorage.setItem("token", res.data.token);
       setIsLoggedIn(true);
     } catch (err) {
