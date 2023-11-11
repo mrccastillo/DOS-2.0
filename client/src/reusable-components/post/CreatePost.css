@@ -50,8 +50,10 @@
 }
 
 .close-btn {
+  cursor: pointer;
   width: 2.5rem;
   height: 2.5rem;
+  text-align: center;
   background-color: #38527800;
   color: #292f33;
   border: none;
