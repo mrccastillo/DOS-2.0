@@ -10,49 +10,112 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState("");
 
   //controlled elements
+  //login
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [isRememberMe, setIsRememberMe] = useState(false);
+
+  //signup
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
   const [firstName, setFisrtName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [section, setSection] = useState("");
+  const [section, setSection] = useState(0);
+  const [userId, setUserId] = useState("");
   const [code, setCode] = useState("");
-
-  function handleSignUpSubmit(e) {
+  const [verificationCode, setVerificationCode] = useState("");
+  async function handleSignUpSubmit(e) {
     e.preventDefault();
-    if (steps < 2) {
+    if (steps === 0) {
       console.log(steps);
       setErrorMsg("");
       //don't proceed to next step when form is not filled out
-      if (steps === 0 && (!email || !username || password !== confirmPass)) {
+      if (!email || !username || password !== confirmPass) {
         if (password !== confirmPass)
           setErrorMsg("Please confirm your password");
         else setErrorMsg("Please fill out the fields");
         return;
-      }
-      if (steps === 1 && (!firstName || !lastName || !section)) {
-        setErrorMsg("Please fill out the fields");
-        return;
-      }
-      if (steps >= 2 && !code) {
-        setErrorMsg("Please fill out the fields");
-        return;
+      } else {
+        const newUser = {
+          username: username,
+          email: email,
+          password: password,
+        };
+
+        try {
+          const res = await axios.post(
+            "https://backend.dosshs.online/api/auth/signup",
+            newUser
+          );
+          if (res.data.message === "Signed Up Successfully") {
+            setUserId(res.data.id);
+            localStorage.setItem("tempToken", res.data.token);
+          }
+        } catch (err) {
+          console.error(err);
+          if (err.response.data.err.keyValue.email)
+            return setErrorMsg("Email already in use.");
+          else if (err.response.data.err.keyValue.username)
+            return setErrorMsg("Username is taken.");
+          return setErrorMsg(err);
+        }
       }
       setSteps((prevStep) => prevStep + 1);
-    } else {
-      //dito
-      console.log("email: ", email);
-      console.log("username: ", username);
-      console.log("password: ", password);
-      console.log("firstName: ", firstName);
-      console.log("lastName: ", lastName);
-      console.log("section: ", section);
-      console.log("code: ", code);
-      console.log("ACCOUNT CREATED!");
-      setSteps(0);
+    } else if (steps === 1) {
+      if (!firstName || !lastName) {
+        setErrorMsg("Please fill out the fields");
+        return;
+      } else {
+        const user = {
+          firstname: firstName,
+          lastname: lastName,
+          section: section,
+        };
+
+        try {
+          const res = await axios.put(
+            `https://backend.dosshs.online/api/user/${userId}`,
+            user,
+            {
+              headers: {
+                Authorization: localStorage.getItem("tempToken"),
+              },
+            }
+          );
+          console.log(res.data.body);
+          if (res.data.message === "Account Successfully Updated") {
+            const emailRes = await axios.put(
+              `https://backend.dosshs.online/api/mail/signup/${userId}`
+            );
+            setVerificationCode(emailRes.data.verificationToken);
+            setSteps((prevStep) => prevStep + 1);
+          }
+          // localStorage.setItem("token", res.data.token);
+          // setIsLoggedIn(true);
+        } catch (err) {
+          return setErrorMsg(err.response.data.message);
+          // console.log(err.response.data.message);
+        }
+      }
+    } else if (steps === 2) {
+      if (!code) {
+        setErrorMsg("Please enter the code sent to your email address");
+        return;
+      } else if (code !== verificationCode) {
+        setErrorMsg("Invalid verification code");
+        return;
+      } else {
+        const verifyRes = await axios.get(
+          `https://backend.dosshs.online/api/verify/email?token=${code}`
+        );
+
+        if (verifyRes.data.message === "Email Successfully Verified") {
+          localStorage.setItem("token", localStorage.getItem("tempToken"));
+          localStorage.removeItem("tempToken");
+          setIsLoggedIn(true);
+        }
+      }
       setEmail("");
       setUsername("");
       setPassword("");
@@ -148,11 +211,11 @@ export default function Login() {
                             backgroundColor: "white",
                             color: "#000",
                           }}
-                          value={email}
+                          value={username}
                           onChange={(e) => {
-                            setEmail(e.target.value);
+                            setUsername(e.target.value);
                           }}
-                          placeholder="Enter your email "
+                          placeholder="Enter your username  "
                         />
                         <input
                           type="text"
@@ -162,11 +225,11 @@ export default function Login() {
                             backgroundColor: "white",
                             color: "#000",
                           }}
-                          value={username}
+                          value={email}
                           onChange={(e) => {
-                            setUsername(e.target.value);
+                            setEmail(e.target.value);
                           }}
-                          placeholder="Enter your username  "
+                          placeholder="Enter your email "
                         />
                       </>
                     )}
@@ -242,7 +305,7 @@ export default function Login() {
                       />
                     )}
                     <input
-                      type="text"
+                      type="number"
                       className="login-input --white-btn"
                       style={{
                         borderColor: "#4f709c",
@@ -251,7 +314,7 @@ export default function Login() {
                       }}
                       value={section}
                       onChange={(e) => {
-                        setSection(e.target.value);
+                        setSection(0);
                       }}
                       placeholder="Section"
                     />
@@ -260,7 +323,7 @@ export default function Login() {
                   steps >= 2 && (
                     <>
                       <p className="signin-text">
-                        Enter the code sent to example@gmail.com
+                        Enter the code sent to {email}
                         <br />
                         to finalize your account.
                       </p>

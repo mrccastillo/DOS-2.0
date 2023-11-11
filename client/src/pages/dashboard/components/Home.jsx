@@ -1,10 +1,12 @@
 import Post from "../../../reusable-components/post/Post";
+import CreatePost from "../../../reusable-components/post/CreatePost";
 import "../stylesheets/Home.css";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-export default function Home() {
+export default function Home({ fullname, username, userId }) {
   const [posts, setPosts] = useState([]);
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
 
   const fetchPosts = async () => {
     try {
@@ -56,34 +58,56 @@ export default function Home() {
     }
   };
 
+  const handlePostCreated = () => {
+    fetchPosts();
+  };
+
   useEffect(() => {
     fetchPosts();
-  }, []); // The empty dependency array ensures the effect runs only once on component mount
+  }, []);
 
   return (
-    <div className="home-container">
-      <div className="filter-container">
-        <span className="--chip">DOS is For You!</span>
-        <span className="--chip">General</span>
-        <span className="--chip">PUP</span>
-        <span className="--chip">Rant</span>
-      </div>
-      <div className="post-container">
-        <div className="create-post">
-          <button className="post-btn">Post Something</button>
+    <>
+      <div className="home-container">
+        <div className="filter-container">
+          <span className="--chip">DOS is For You!</span>
+          <span className="--chip">General</span>
+          <span className="--chip">PUP</span>
+          <span className="--chip">Rant</span>
         </div>
-        <div className="posts-list">
-          {posts.map((el) => (
-            <Post
-              key={el._id}
-              fullname={el.fullname}
-              username={el.username}
-              content={el.content}
-              date={el.dateCreated}
-            />
-          ))}
+        <div className="post-container">
+          <div className="create-post">
+            <button
+              className="post-btn"
+              onClick={() => setIsCreatePostOpen(!isCreatePostOpen)}
+            >
+              Post Something
+            </button>
+          </div>
+          <div className="posts-list">
+            {posts.map((el) => (
+              <Post
+                key={el._id}
+                fullname={el.fullname}
+                username={el.username}
+                content={el.content}
+                date={el.dateCreated}
+              />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+      {isCreatePostOpen && (
+        <CreatePost
+          fullname={fullname}
+          username={username}
+          userId={userId}
+          onPostCreated={handlePostCreated}
+          onModalClose={() => {
+            setIsCreatePostOpen(!isCreatePostOpen);
+          }}
+        />
+      )}
+    </>
   );
 }
