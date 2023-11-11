@@ -83,7 +83,6 @@ export default function Login() {
               },
             }
           );
-          console.log(res.data.body);
           if (res.data.message === "Account Successfully Updated") {
             const emailRes = await axios.put(
               `https://backend.dosshs.online/api/mail/signup/${userId}`
@@ -94,8 +93,8 @@ export default function Login() {
           // localStorage.setItem("token", res.data.token);
           // setIsLoggedIn(true);
         } catch (err) {
-          return setErrorMsg(err.response.data.message);
-          // console.log(err.response.data.message);
+          setErrorMsg(err);
+          return console.log(err);
         }
       }
     } else if (steps === 2) {

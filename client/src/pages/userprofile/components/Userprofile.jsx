@@ -6,10 +6,14 @@ import Nav from "../../nav/components/Nav";
 import CreateAnnouncement from "../../../reusable-components/announcement/CreateAnnouncement";
 import CreatePost from "../../../reusable-components/post/CreatePost";
 import "../stylesheets/Userprofile.css";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 
 export default function Userprofile() {
+  const token = localStorage.getItem("token");
+  const { username } = useParams();
   const [user, setUser] = useState([]);
+  const [userLoggedIn, setUserLoggedIn] = useState([]);
   const [posts, setPosts] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
@@ -20,16 +24,27 @@ export default function Userprofile() {
     (el) => el.username === user.username
   );
 
+  const fetchUser = async () => {
+    const user = await axios.get(
+      `https://backend.dosshs.online/api/user?username=${username}`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
+    setUser(user.data.other);
+  };
+
   const decodeUser = () => {
     const token = localStorage.getItem("token");
     const User = jwtDecode(token);
     const parsedUser = JSON.parse(User.user);
-    setUser(parsedUser);
+    setUserLoggedIn(parsedUser);
   };
 
   const fetchPosts = async () => {
     try {
-      const token = localStorage.getItem("token");
       const announcement = await axios.get(
         "https://backend.dosshs.online/api/announcement",
         {
@@ -84,7 +99,7 @@ export default function Userprofile() {
       // const postsWithCounts = await Promise.all(postsResponse.data);
       setPosts(post.data);
     } catch (error) {
-      console.error("Error fetching posts:", error);
+      return console.error("Error fetching posts:", error);
     }
   };
 
@@ -93,6 +108,7 @@ export default function Userprofile() {
   };
 
   useEffect(() => {
+    fetchUser();
     decodeUser();
     fetchPosts();
   }, []);
@@ -112,30 +128,40 @@ export default function Userprofile() {
               {" "}
               @{user.username}
             </p>
-            <p className="bio">"{user.bio}"</p>
+            {user.bio ? <p className="bio">"{user.bio}"</p> : null}
           </div>
           <div className="userpost-container">
             <div className="userpost-container-header">
-              <h2 style={{ fontSize: "1.5rem" }}>Your Post / Announcements</h2>
-              <div>
-                <button
-                  className="post-btn"
-                  style={{ marginRight: "1rem" }}
-                  onClick={() => {
-                    setIsCreateAnnounceOpen(!isCreateAnnounceOpen);
-                  }}
-                >
-                  Make an Announcement
-                </button>
-                <button
-                  className="post-btn"
-                  onClick={() => {
-                    setIsCreatePostOpen(!isCreatePostOpen);
-                  }}
-                >
-                  Post Something
-                </button>
-              </div>
+              {user._id === userLoggedIn._id ? (
+                <h2 style={{ fontSize: "1.5rem" }}>
+                  Your Post & Announcements
+                </h2>
+              ) : (
+                <h2 style={{ fontSize: "1.5rem" }}>
+                  {user.username}'s Posts & Announcements
+                </h2>
+              )}
+              {user._id === userLoggedIn._id ? (
+                <div>
+                  <button
+                    className="post-btn"
+                    style={{ marginRight: "1rem" }}
+                    onClick={() => {
+                      setIsCreateAnnounceOpen(!isCreateAnnounceOpen);
+                    }}
+                  >
+                    Make an Announcement
+                  </button>
+                  <button
+                    className="post-btn"
+                    onClick={() => {
+                      setIsCreatePostOpen(!isCreatePostOpen);
+                    }}
+                  >
+                    Post Something
+                  </button>
+                </div>
+              ) : null}
             </div>
             <div className="user-post-and-announcements">
               <div className="user-announcement">
