@@ -30,8 +30,16 @@ export default function Dashboard() {
           <h2 className="--big-h2">Hello, {user.username}!</h2>
         </div>
         <div className="posts-announcements-container">
-          <Announcements />
-          <Home />
+          <Announcements
+            fullname={user.fullname}
+            username={user.username}
+            userId={user._id}
+          />
+          <Home
+            fullname={user.fullname}
+            username={user.username}
+            userId={user._id}
+          />
         </div>
       </div>
     </div>

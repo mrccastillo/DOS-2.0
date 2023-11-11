@@ -3,6 +3,8 @@ import { jwtDecode } from "jwt-decode";
 import Post from "../../../reusable-components/post/Post";
 import Announce from "../../../reusable-components/announcement/Announce";
 import Nav from "../../nav/components/Nav";
+import CreateAnnouncement from "../../../reusable-components/announcement/CreateAnnouncement";
+import CreatePost from "../../../reusable-components/post/CreatePost";
 import "../stylesheets/Userprofile.css";
 import axios from "axios";
 
@@ -10,6 +12,8 @@ export default function Userprofile() {
   const [user, setUser] = useState([]);
   const [posts, setPosts] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+  const [isCreateAnnounceOpen, setIsCreateAnnounceOpen] = useState(false);
 
   const filteredPosts = posts.filter((el) => el.username === user.username);
   const filteredAnnouncements = announcements.filter(
@@ -84,70 +88,111 @@ export default function Userprofile() {
     }
   };
 
+  const handlePostCreated = () => {
+    fetchPosts();
+  };
+
   useEffect(() => {
     decodeUser();
     fetchPosts();
   }, []);
 
   return (
-    <div className="container">
-      <Nav />
-      <div className="dashboard --userprofile">
-        <h2 className="--big-h2">Profile</h2>
-        <div className="userprofile-container">
-          <div className="profile-pic --userprofile-pic"></div>
-          <p className="display-name" style={{ fontSize: "1.3rem" }}>
-            {user.firstname} {user.lastname}
-          </p>
-          <p className="username" style={{ fontSize: "1rem" }}>
-            {" "}
-            @{user.username}
-          </p>
-          <p className="bio">"{user.bio}"</p>
-        </div>
-        <div className="userpost-container">
-          <div className="userpost-container-header">
-            <h2 style={{ fontSize: "1.5rem" }}>Your Post / Announcements</h2>
-            <div>
-              <button className="post-btn" style={{ marginRight: "1rem" }}>
-                Make an Announcement
-              </button>
-              <button className="post-btn">Post Something</button>
-            </div>
+    <>
+      <div className="container">
+        <Nav />
+        <div className="dashboard --userprofile">
+          <h2 className="--big-h2">Profile</h2>
+          <div className="userprofile-container">
+            <div className="profile-pic --userprofile-pic"></div>
+            <p className="display-name" style={{ fontSize: "1.3rem" }}>
+              {user.fullname}
+            </p>
+            <p className="username" style={{ fontSize: "1rem" }}>
+              {" "}
+              @{user.username}
+            </p>
+            <p className="bio">"{user.bio}"</p>
           </div>
-          <div className="user-post-and-announcements">
-            <div className="user-announcement">
-              {filteredAnnouncements.length > 0 ? (
-                filteredAnnouncements.map((filteredAnnounce) => (
-                  <Announce
-                    key={filteredAnnounce._id}
-                    fullname={filteredAnnounce.fullname}
-                    username={filteredAnnounce.username}
-                    content={filteredAnnounce.content}
-                  />
-                ))
-              ) : (
-                <p className="empty">You haven't created announcement yet</p>
-              )}
+          <div className="userpost-container">
+            <div className="userpost-container-header">
+              <h2 style={{ fontSize: "1.5rem" }}>Your Post / Announcements</h2>
+              <div>
+                <button
+                  className="post-btn"
+                  style={{ marginRight: "1rem" }}
+                  onClick={() => {
+                    setIsCreateAnnounceOpen(!isCreateAnnounceOpen);
+                  }}
+                >
+                  Make an Announcement
+                </button>
+                <button
+                  className="post-btn"
+                  onClick={() => {
+                    setIsCreatePostOpen(!isCreatePostOpen);
+                  }}
+                >
+                  Post Something
+                </button>
+              </div>
             </div>
-            <div className="user-post">
-              {filteredPosts.length > 0 ? (
-                filteredPosts.map((filteredPost) => (
-                  <Post
-                    key={filteredPost._id}
-                    fullname={filteredPost.fullname}
-                    username={filteredPost.username}
-                    content={filteredPost.content}
-                    date={filteredPost.dateCreated}
-                  />
-                ))
-              ) : (
-                <p className="empty">You haven't posted anything</p>
-              )}
+            <div className="user-post-and-announcements">
+              <div className="user-announcement">
+                {filteredAnnouncements.length > 0 ? (
+                  filteredAnnouncements.map((filteredAnnounce) => (
+                    <Announce
+                      key={filteredAnnounce._id}
+                      fullname={filteredAnnounce.fullname}
+                      username={filteredAnnounce.username}
+                      content={filteredAnnounce.content}
+                    />
+                  ))
+                ) : (
+                  <p className="empty">You haven't created announcement yet</p>
+                )}
+              </div>
+              <div className="user-post">
+                {filteredPosts.length > 0 ? (
+                  filteredPosts.map((filteredPost) => (
+                    <Post
+                      key={filteredPost._id}
+                      fullname={filteredPost.fullname}
+                      username={filteredPost.username}
+                      content={filteredPost.content}
+                      date={filteredPost.dateCreated}
+                    />
+                  ))
+                ) : (
+                  <p className="empty">You haven't posted anything</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      {isCreatePostOpen && (
+        <CreatePost
+          fullname={user.fullname}
+          username={user.username}
+          userId={user._id}
+          onPostCreated={handlePostCreated}
+          onModalClose={() => {
+            setIsCreatePostOpen(!isCreatePostOpen);
+          }}
+        />
+      )}
+      {isCreateAnnounceOpen && (
+        <CreateAnnouncement
+          fullname={user.fullname}
+          username={user.username}
+          userId={user.userId}
+          onAnnouncementCreated={handlePostCreated}
+          onModalClose={() => {
+            setIsCreateAnnounceOpen(!isCreateAnnounceOpen);
+          }}
+        />
+      )}
+    </>
   );
 }

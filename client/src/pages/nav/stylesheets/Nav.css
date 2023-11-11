@@ -13,4 +13,10 @@
   width: 100%;
   background-color: #e6d283;
   border-radius: 2rem;
+  padding: 2rem 0.5rem;
+}
+
+.navlinks-container {
+  display: flex;
+  flex-direction: column;
 }
