@@ -21,6 +21,7 @@ export default function CreatePost({
       fullname: fullname,
       title: "testtitle",
       content: content,
+      dateCreated: Date.now(),
     };
 
     try {
