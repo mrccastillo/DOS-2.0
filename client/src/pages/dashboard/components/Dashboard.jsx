@@ -5,23 +5,20 @@ import "../stylesheets/Dashboard.css";
 import { jwtDecode } from "jwt-decode";
 import { useState, useEffect } from "react";
 
-export default function Dashboard() {
-  const [user, setUser] = useState([]);
-
-  const decodeUser = () => {
-    const token = localStorage.getItem("token");
-    const User = jwtDecode(token);
-    const parsedUser = JSON.parse(User.user);
-    setUser(parsedUser);
-  };
-
+export default function Dashboard({ user }) {
   useEffect(() => {
-    decodeUser();
+    if (window.localStorage) {
+      if (!localStorage.getItem("firstLoad")) {
+        localStorage["firstLoad"] = true;
+        window.location.reload();
+      }
+    }
+    console.log(user);
   }, []);
 
   return (
     <div className="container">
-      <Nav />
+      <Nav user={user.username} />
       <div className="dashboard">
         <div className="header">
           <div className="dosboard-and-search-container">

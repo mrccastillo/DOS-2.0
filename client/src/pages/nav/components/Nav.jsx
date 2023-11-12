@@ -3,22 +3,20 @@ import "../stylesheets/Nav.css";
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 
-export default function Nav() {
-  const [user, setUser] = useState([]);
-
+export default function Nav({ user }) {
   const logOut = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("firstLoad");
     location.href = "/";
   };
 
-  const decodeUser = () => {
-    const User = jwtDecode(localStorage.getItem("token"));
-    const parsedUser = JSON.parse(User.user);
-    setUser(parsedUser);
-  };
-
   useEffect(() => {
-    decodeUser();
+    if (window.localStorage) {
+      if (!localStorage.getItem("firstLoad")) {
+        localStorage["firstLoad"] = true;
+        window.location.reload();
+      }
+    }
   }, []);
 
   return (
@@ -27,7 +25,7 @@ export default function Nav() {
         <div className="navlinks-container">
           <Link to="/">Dashboard</Link>
           <br />
-          <Link to={`/${user.username}`}>Profile</Link>
+          <Link to={`/${user}`}>Profile</Link>
           {/* <Link to={`/${user.username}`} User Profile </Link> */}
           <br />
           <Link to="/" onClick={logOut}>

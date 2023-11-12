@@ -9,11 +9,10 @@ import "../stylesheets/Userprofile.css";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
-export default function Userprofile() {
+export default function Userprofile({ userLoggedIn }) {
   const token = localStorage.getItem("token");
   const { username } = useParams();
   const [user, setUser] = useState([]);
-  const [userLoggedIn, setUserLoggedIn] = useState([]);
   const [posts, setPosts] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
@@ -34,13 +33,6 @@ export default function Userprofile() {
       }
     );
     setUser(user.data.other);
-  };
-
-  const decodeUser = () => {
-    const token = localStorage.getItem("token");
-    const User = jwtDecode(token);
-    const parsedUser = JSON.parse(User.user);
-    setUserLoggedIn(parsedUser);
   };
 
   const fetchPosts = async () => {
@@ -109,7 +101,6 @@ export default function Userprofile() {
 
   useEffect(() => {
     fetchUser();
-    decodeUser();
     fetchPosts();
   }, [username]);
 

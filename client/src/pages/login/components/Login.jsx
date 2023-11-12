@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import "../stylesheets/Login.css";
 import axios from "axios";
 
-export default function Login() {
+export default function Login({ onDecodeUser }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInSignInPage, setIsInSignInPage] = useState(true);
   const [steps, setSteps] = useState(0);
@@ -28,7 +28,7 @@ export default function Login() {
   async function handleSignUpSubmit(e) {
     e.preventDefault();
     if (steps === 0) {
-      console.log(steps);
+      // console.log(steps);
       setErrorMsg("");
       //don't proceed to next step when form is not filled out
       if (!email || !username || password !== confirmPass) {
@@ -83,10 +83,11 @@ export default function Login() {
               },
             }
           );
+          localStorage.setItem("tempToken", res.data.token);
           if (res.data.message === "Account Successfully Updated") {
-            const emailRes = await axios.put(
-              `https://backend.dosshs.online/api/mail/signup/${userId}`
-            );
+            const emailRes = await axios.put(`
+              https://backend.dosshs.online/api/mail/signup/${userId}
+            `);
             setVerificationCode(emailRes.data.verificationToken);
             setSteps((prevStep) => prevStep + 1);
           }
@@ -94,7 +95,7 @@ export default function Login() {
           // setIsLoggedIn(true);
         } catch (err) {
           setErrorMsg(err);
-          return console.log(err);
+          return console.error(err);
         }
       }
     } else if (steps === 2) {
@@ -105,9 +106,9 @@ export default function Login() {
         setErrorMsg("Invalid verification code");
         return;
       } else {
-        const verifyRes = await axios.get(
-          `https://backend.dosshs.online/api/verify/email?token=${code}`
-        );
+        const verifyRes = await axios.get(`
+          https://backend.dosshs.online/api/verify/email?token=${code}
+        `);
 
         if (verifyRes.data.message === "Email Successfully Verified") {
           localStorage.setItem("token", localStorage.getItem("tempToken"));
@@ -145,6 +146,7 @@ export default function Login() {
         user
       );
       localStorage.setItem("token", res.data.token);
+
       setIsLoggedIn(true);
     } catch (err) {
       return setErrorMsg(err.response.data.message);
