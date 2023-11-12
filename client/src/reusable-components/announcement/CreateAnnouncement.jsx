@@ -89,7 +89,9 @@ export default function CreateAnnouncement({
             </div>
           </div>
         </div>
-        <button className="submit-post">{isCreatingAnnouncement}</button>
+        <div className="btn-container">
+          <button className="submit-post">{isCreatingAnnouncement}</button>
+        </div>
         <p className="close-btn" onClick={closeModal}>
           &times;
         </p>

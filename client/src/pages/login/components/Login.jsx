@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import "../stylesheets/Login.css";
 import axios from "axios";
+import { Helmet } from "react-helmet";
 
-export default function Login() {
+export default function Login({ onDecodeUser }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInSignInPage, setIsInSignInPage] = useState(true);
   const [steps, setSteps] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
+  const [signUpBtnMsg, setSignUpBtnMsg] = useState("NEXT");
+  const [loginBtnMsg, setLoginBtnMsg] = useState("LOG IN");
 
   //controlled elements
   //login
@@ -25,16 +28,43 @@ export default function Login() {
   const [userId, setUserId] = useState("");
   const [code, setCode] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
+
+  function validate_email(email) {
+    let expression = /^[^@]+@\w+(\.\w+)+\w$/;
+    if (expression.test(email) == true) {
+      setErrorMsg("");
+    } else {
+      console.log(false);
+      setErrorMsg("Invalid Email");
+    }
+  }
+
   async function handleSignUpSubmit(e) {
     e.preventDefault();
     if (steps === 0) {
-      console.log(steps);
+      // console.log(steps);
       setErrorMsg("");
       //don't proceed to next step when form is not filled out
-      if (!email || !username || password !== confirmPass) {
-        if (password !== confirmPass)
-          setErrorMsg("Please confirm your password");
-        else setErrorMsg("Please fill out the fields");
+
+      if (password !== confirmPass) {
+        setErrorMsg("Please confirm your password");
+      }
+      if (password.length < 6) {
+        setErrorMsg("Password should be atleast 6 characters");
+      }
+      if (username.length < 3) {
+        setErrorMsg("Username should be atleast 3 characters");
+      }
+      if (
+        !email ||
+        !username ||
+        password !== confirmPass ||
+        password.length < 6 ||
+        username.length < 3
+      ) {
+        if (!email || !username || !password || !confirmPass) {
+          setErrorMsg("Please fill out the fields");
+        }
         return;
       } else {
         const newUser = {
@@ -42,7 +72,7 @@ export default function Login() {
           email: email,
           password: password,
         };
-
+        setSignUpBtnMsg("Signing you up...");
         try {
           const res = await axios.post(
             "https://backend.dosshs.online/api/auth/signup",
@@ -54,6 +84,7 @@ export default function Login() {
           }
         } catch (err) {
           console.error(err);
+          setSignUpBtnMsg("NEXT");
           if (err.response.data.err.keyValue.email)
             return setErrorMsg("Email already in use.");
           else if (err.response.data.err.keyValue.username)
@@ -62,8 +93,19 @@ export default function Login() {
         }
       }
       setSteps((prevStep) => prevStep + 1);
+      setSignUpBtnMsg("NEXT");
     } else if (steps === 1) {
-      if (!firstName || !lastName) {
+      if (
+        !firstName ||
+        !lastName ||
+        firstName.length < 3 ||
+        lastName.length < 3
+      ) {
+        if (firstName.length < 3 || lastName.length < 3) {
+          setErrorMsg(
+            "First Name and Last Name should be atleast 3 characters"
+          );
+        }
         setErrorMsg("Please fill out the fields");
         return;
       } else {
@@ -72,7 +114,7 @@ export default function Login() {
           lastname: lastName,
           section: section,
         };
-
+        setSignUpBtnMsg("We're sending you a verification code...");
         try {
           const res = await axios.put(
             `https://backend.dosshs.online/api/user/${userId}`,
@@ -83,31 +125,36 @@ export default function Login() {
               },
             }
           );
+          localStorage.setItem("tempToken", res.data.token);
           if (res.data.message === "Account Successfully Updated") {
-            const emailRes = await axios.put(
-              `https://backend.dosshs.online/api/mail/signup/${userId}`
-            );
+            const emailRes = await axios.put(`
+              https://backend.dosshs.online/api/mail/signup/${userId}
+            `);
             setVerificationCode(emailRes.data.verificationToken);
             setSteps((prevStep) => prevStep + 1);
           }
           // localStorage.setItem("token", res.data.token);
           // setIsLoggedIn(true);
         } catch (err) {
+          setSignUpBtnMsg("NEXT");
           setErrorMsg(err);
-          return console.log(err);
+          return console.error(err);
         }
       }
+      setSignUpBtnMsg("CONFIRM");
     } else if (steps === 2) {
       if (!code) {
         setErrorMsg("Please enter the code sent to your email address");
         return;
       } else if (code !== verificationCode) {
         setErrorMsg("Invalid verification code");
+
         return;
       } else {
-        const verifyRes = await axios.get(
-          `https://backend.dosshs.online/api/verify/email?token=${code}`
-        );
+        setSignUpBtnMsg("Creating your account...");
+        const verifyRes = await axios.get(`
+          https://backend.dosshs.online/api/verify/email?token=${code}
+        `);
 
         if (verifyRes.data.message === "Email Successfully Verified") {
           localStorage.setItem("token", localStorage.getItem("tempToken"));
@@ -124,6 +171,7 @@ export default function Login() {
       setSection("");
       setCode("");
       setErrorMsg("");
+      setSignUpBtnMsg("NEXT");
     }
   }
 
@@ -140,11 +188,13 @@ export default function Login() {
     };
 
     try {
+      setLoginBtnMsg("LOGGING IN");
       const res = await axios.post(
         "https://backend.dosshs.online/api/auth/login",
         user
       );
       localStorage.setItem("token", res.data.token);
+
       setIsLoggedIn(true);
     } catch (err) {
       return setErrorMsg(err.response.data.message);
@@ -154,37 +204,138 @@ export default function Login() {
     setPassword("");
     setIsRememberMe();
     setErrorMsg("");
+    setLoginBtnMsg("LOG IN");
   }
+
+  useEffect(() => {
+    localStorage.setItem("isInSignInPage", isInSignInPage);
+  });
 
   if (isLoggedIn) {
     return <Navigate to="/dashboard" />;
   } else {
     return (
-      <div className="login-background">
-        <div className="login-page" style={{ position: "relative" }}>
-          <div
-            className="login-form-container"
-            style={{
-              left: isInSignInPage /* && isInDesktop*/ ? 0 : "100%",
-              transform: !isInSignInPage && "translateX(-100%)",
-              position: "absolute",
-              transition: "300ms ease-out ",
-            }}
-          >
-            <form className="login-form">
-              <div className="form-fields-container">
-                <h1 className="form-header">
-                  {isInSignInPage ? "Hello World!" : "Create Account"}
-                </h1>
-                <p className="form-subheader">
-                  {" "}
-                  {isInSignInPage
-                    ? "Sign into your DOS Account"
-                    : "Join DOS Now!"}
-                </p>
-                {steps === 0 ? (
-                  <>
-                    {isInSignInPage && (
+      <>
+        <Helmet>
+          <title>DOS</title>
+          <meta property="og:title" content="Login or Sign up" />
+          {/* Add other meta tags as needed */}
+        </Helmet>
+        <div className="login-background">
+          <div className="login-page" style={{ position: "relative" }}>
+            <div
+              className="login-form-container"
+              style={{
+                left: isInSignInPage /* && isInDesktop*/ ? 0 : "100%",
+                transform: !isInSignInPage && "translateX(-100%)",
+                position: "absolute",
+                transition: "300ms ease-out ",
+              }}
+            >
+              <form className="login-form">
+                <div className="form-fields-container">
+                  <h1 className="form-header">
+                    {isInSignInPage ? "Hello World!" : "Create Account"}
+                  </h1>
+                  <p className="form-subheader">
+                    {" "}
+                    {isInSignInPage
+                      ? "Sign into your DOS Account"
+                      : "Join DOS Now!"}
+                  </p>
+                  {steps === 0 ? (
+                    <>
+                      {isInSignInPage && (
+                        <input
+                          type="text"
+                          className="login-input --white-btn"
+                          style={{
+                            borderColor: "#4f709c",
+                            backgroundColor: "white",
+                            color: "#000",
+                          }}
+                          value={usernameOrEmail}
+                          onChange={(e) => {
+                            setUsernameOrEmail(e.target.value);
+                          }}
+                          placeholder="Enter your username or email "
+                          required
+                        />
+                      )}
+                      {!isInSignInPage && (
+                        <>
+                          <input
+                            type="text"
+                            className="login-input --white-btn"
+                            style={{
+                              borderColor: "#4f709c",
+                              backgroundColor: "white",
+                              color: "#000",
+                            }}
+                            value={username}
+                            onChange={(e) => {
+                              setUsername(e.target.value);
+                            }}
+                            placeholder="Enter your username  "
+                          />
+                          <input
+                            type="text"
+                            className="login-input --white-btn"
+                            style={{
+                              borderColor: "#4f709c",
+                              backgroundColor: "white",
+                              color: "#000",
+                            }}
+                            value={email}
+                            onChange={(e) => {
+                              setEmail(e.target.value);
+                              validate_email(e.target.value);
+                            }}
+                            placeholder="Enter your email "
+                          />
+                        </>
+                      )}
+                      <input
+                        type="password"
+                        className="login-input --white-btn"
+                        style={{
+                          borderColor: "#4f709c",
+                          backgroundColor: "white",
+                          color: "#000",
+                        }}
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (!isInSignInPage) {
+                            if (e.target.value != confirmPass)
+                              setErrorMsg("Password didn't match");
+                            else setErrorMsg("");
+                          }
+                        }}
+                        placeholder="Enter your password"
+                      />
+                      {!isInSignInPage && (
+                        <input
+                          type="text"
+                          className="login-input --white-btn"
+                          style={{
+                            borderColor: "#4f709c",
+                            backgroundColor: "white",
+                            color: "#000",
+                          }}
+                          value={confirmPass}
+                          onChange={(e) => {
+                            setConfirmPass(e.target.value);
+                            if (e.target.value != password)
+                              setErrorMsg("Password didn't match");
+                            else setErrorMsg("");
+                          }}
+                          placeholder="Confirm Password  "
+                        />
+                      )}
+                    </>
+                  ) : steps === 1 ? (
+                    <>
                       <input
                         type="text"
                         className="login-input --white-btn"
@@ -193,15 +344,13 @@ export default function Login() {
                           backgroundColor: "white",
                           color: "#000",
                         }}
-                        value={usernameOrEmail}
+                        value={firstName}
                         onChange={(e) => {
-                          setUsernameOrEmail(e.target.value);
+                          setFisrtName(e.target.value);
                         }}
-                        placeholder="Enter your username or email "
+                        placeholder="First Name"
                       />
-                    )}
-                    {!isInSignInPage && (
-                      <>
+                      {!isInSignInPage && (
                         <input
                           type="text"
                           className="login-input --white-btn"
@@ -210,12 +359,36 @@ export default function Login() {
                             backgroundColor: "white",
                             color: "#000",
                           }}
-                          value={username}
+                          value={lastName}
                           onChange={(e) => {
-                            setUsername(e.target.value);
+                            setLastName(e.target.value);
                           }}
-                          placeholder="Enter your username  "
+                          placeholder="Last Name"
                         />
+                      )}
+                      <input
+                        type="number"
+                        className="login-input --white-btn"
+                        style={{
+                          borderColor: "#4f709c",
+                          backgroundColor: "white",
+                          color: "#000",
+                        }}
+                        value={section}
+                        onChange={(e) => {
+                          setSection(0);
+                        }}
+                        placeholder="Section"
+                      />
+                    </>
+                  ) : (
+                    steps >= 2 && (
+                      <>
+                        <p className="signin-text">
+                          Enter the code sent to {email}
+                          <br />
+                          to finalize your account.
+                        </p>
                         <input
                           type="text"
                           className="login-input --white-btn"
@@ -224,209 +397,100 @@ export default function Login() {
                             backgroundColor: "white",
                             color: "#000",
                           }}
-                          value={email}
+                          value={code}
                           onChange={(e) => {
-                            setEmail(e.target.value);
+                            setCode(e.target.value);
                           }}
-                          placeholder="Enter your email "
+                          placeholder="Code"
                         />
                       </>
-                    )}
-                    <input
-                      type="password"
-                      className="login-input --white-btn"
-                      style={{
-                        borderColor: "#4f709c",
-                        backgroundColor: "white",
-                        color: "#000",
-                      }}
-                      value={password}
-                      onChange={(e) => {
-                        setPassword(e.target.value);
-                        if (!isInSignInPage) {
-                          if (e.target.value != confirmPass)
-                            setErrorMsg("Password didn't match");
-                          else setErrorMsg("");
-                        }
-                      }}
-                      placeholder="Enter your password"
-                    />
-                    {!isInSignInPage && (
-                      <input
-                        type="text"
-                        className="login-input --white-btn"
-                        style={{
-                          borderColor: "#4f709c",
-                          backgroundColor: "white",
-                          color: "#000",
-                        }}
-                        value={confirmPass}
-                        onChange={(e) => {
-                          setConfirmPass(e.target.value);
-                          if (e.target.value != password)
-                            setErrorMsg("Password didn't match");
-                          else setErrorMsg("");
-                        }}
-                        placeholder="Confirm Password  "
-                      />
-                    )}
-                  </>
-                ) : steps === 1 ? (
-                  <>
-                    <input
-                      type="text"
-                      className="login-input --white-btn"
-                      style={{
-                        borderColor: "#4f709c",
-                        backgroundColor: "white",
-                        color: "#000",
-                      }}
-                      value={firstName}
-                      onChange={(e) => {
-                        setFisrtName(e.target.value);
-                      }}
-                      placeholder="First Name"
-                    />
-                    {!isInSignInPage && (
-                      <input
-                        type="text"
-                        className="login-input --white-btn"
-                        style={{
-                          borderColor: "#4f709c",
-                          backgroundColor: "white",
-                          color: "#000",
-                        }}
-                        value={lastName}
-                        onChange={(e) => {
-                          setLastName(e.target.value);
-                        }}
-                        placeholder="Last Name"
-                      />
-                    )}
-                    <input
-                      type="number"
-                      className="login-input --white-btn"
-                      style={{
-                        borderColor: "#4f709c",
-                        backgroundColor: "white",
-                        color: "#000",
-                      }}
-                      value={section}
-                      onChange={(e) => {
-                        setSection(0);
-                      }}
-                      placeholder="Section"
-                    />
-                  </>
-                ) : (
-                  steps >= 2 && (
-                    <>
-                      <p className="signin-text">
-                        Enter the code sent to {email}
-                        <br />
-                        to finalize your account.
-                      </p>
-                      <input
-                        type="text"
-                        className="login-input --white-btn"
-                        style={{
-                          borderColor: "#4f709c",
-                          backgroundColor: "white",
-                          color: "#000",
-                        }}
-                        value={code}
-                        onChange={(e) => {
-                          setCode(e.target.value);
-                        }}
-                        placeholder="Code"
-                      />
-                    </>
-                  )
-                )}
-
-                <div className="utils-container">
-                  {isInSignInPage && (
-                    <>
-                      <div>
-                        <input
-                          type="checkbox"
-                          name="isRememberMe"
-                          id="remember-me"
-                          value={isRememberMe}
-                          onChange={(e) => {
-                            setIsRememberMe(e.target.checked);
-                          }}
-                        />
-                        <label htmlFor="remember-me">Remember Me</label>
-                      </div>
-                      <p>Forgot Password</p>
-                    </>
+                    )
                   )}
+
+                  <div className="utils-container">
+                    {isInSignInPage && (
+                      <>
+                        <div>
+                          <input
+                            type="checkbox"
+                            name="isRememberMe"
+                            id="remember-me"
+                            value={isRememberMe}
+                            onChange={(e) => {
+                              setIsRememberMe(e.target.checked);
+                            }}
+                          />
+                          <label htmlFor="remember-me">Remember Me</label>
+                        </div>
+                        <p>Forgot Password</p>
+                      </>
+                    )}
+                  </div>
+                  <p className="--server-msg">{errorMsg}</p>
                 </div>
-                <p className="--server-msg">{errorMsg}</p>
-              </div>
-              {isInSignInPage ? (
-                <button className="--blue-btn" onClick={handleLogInSubmit}>
-                  SIGN IN
-                </button>
-              ) : (
-                <button className="--blue-btn" onClick={handleSignUpSubmit}>
-                  {steps >= 2 ? "SIGN UP" : "NEXT"}
-                </button>
-              )}
-            </form>
-          </div>
-          <div
-            className="login-message-container"
-            style={{
-              right: isInSignInPage ? 0 : "100%",
-              transform: !isInSignInPage && "translateX(100%)",
-              position: "absolute",
-              transition: "300ms ease-out",
-            }}
-          >
-            <div className="message-container">
-              <h2 className="message-header">
-                {isInSignInPage ? "Welcome Back!" : "Welcome to DOS"}
-              </h2>
-              <p className="message-content">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Voluptate quibusdam quas commodi dolores molestias dignissimos
-                laudantium. Et iste quae sapiente facere. Earum libero placeat
-                quidem officia iste doloribus vero sequi! Quibusdam atque
-                expedita, non fuga, illo tempore minus corrupti sequi voluptatem
-                consequatur tempora exercitationem cum consectetur repudiandae,
-                facere pariatur recusandae earum corporis debitis sint sunt
-                numquam. Eligendi officiis quam debitis.
-              </p>
+                {isInSignInPage ? (
+                  <button className="--blue-btn" onClick={handleLogInSubmit}>
+                    {loginBtnMsg}
+                  </button>
+                ) : (
+                  <button className="--blue-btn" onClick={handleSignUpSubmit}>
+                    {signUpBtnMsg}
+                  </button>
+                )}
+              </form>
             </div>
-            <div className="not-signedin-container">
-              <p className="not-signedin-container-label">
-                {isInSignInPage && " Not yet joined with DOS?"}
-              </p>
-              <button
-                className="--white-btn"
-                onClick={() => {
-                  setIsInSignInPage(!isInSignInPage);
-                  setSteps(0);
-                  setEmail("");
-                  setUsername("");
-                  setPassword("");
-                  setFisrtName("");
-                  setLastName("");
-                  setSection("");
-                  setCode("");
-                  setErrorMsg("");
-                }}
-              >
-                {isInSignInPage
-                  ? " Create an account"
-                  : "Already have an account?"}
-              </button>
+            <div
+              className="login-message-container"
+              style={{
+                right: isInSignInPage ? 0 : "100%",
+                transform: !isInSignInPage && "translateX(100%)",
+                position: "absolute",
+                transition: "300ms ease-out",
+              }}
+            >
+              <div className="message-container">
+                <h2 className="message-header">
+                  {isInSignInPage ? "Welcome Back!" : "Welcome to DOS"}
+                </h2>
+                <p className="message-content">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Voluptate quibusdam quas commodi dolores molestias dignissimos
+                  laudantium. Et iste quae sapiente facere. Earum libero placeat
+                  quidem officia iste doloribus vero sequi! Quibusdam atque
+                  expedita, non fuga, illo tempore minus corrupti sequi
+                  voluptatem consequatur tempora exercitationem cum consectetur
+                  repudiandae, facere pariatur recusandae earum corporis debitis
+                  sint sunt numquam. Eligendi officiis quam debitis.
+                </p>
+              </div>
+              <div className="not-signedin-container">
+                <p className="not-signedin-container-label">
+                  {isInSignInPage
+                    ? " Not yet joined with DOS?"
+                    : "Already have an account?"}
+                </p>
+                <button
+                  className="--white-btn"
+                  onClick={() => {
+                    setIsInSignInPage(!isInSignInPage);
+                    setSteps(0);
+                    setEmail("");
+                    setUsername("");
+                    setPassword("");
+                    setFisrtName("");
+                    setLastName("");
+                    setSection("");
+                    setCode("");
+                    setErrorMsg("");
+                  }}
+                >
+                  {isInSignInPage ? " Create an account" : "LOG IN"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 }

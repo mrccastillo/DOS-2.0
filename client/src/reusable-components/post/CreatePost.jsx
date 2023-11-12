@@ -37,7 +37,6 @@ export default function CreatePost({
     } catch (e) {
       console.error("error:", e);
     }
-    console.log(post);
   }
 
   function closeModal() {
@@ -89,7 +88,9 @@ export default function CreatePost({
             </div>
           </div>
         </div>
-        <button className="submit-post">{isPosting}</button>
+        <div className="btn-container">
+          <button className="submit-post">{isPosting}</button>
+        </div>
         <p className="close-btn" onClick={closeModal}>
           &times;
         </p>

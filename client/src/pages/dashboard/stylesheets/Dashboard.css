@@ -22,3 +22,8 @@
   justify-content: space-around;
   height: calc(100% - 5rem);
 }
+
+.--highlight {
+  color: #e6d283;
+  font-family: Helvetica, sans-serif;
+}

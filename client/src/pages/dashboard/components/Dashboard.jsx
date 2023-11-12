@@ -4,30 +4,30 @@ import Home from "./Home";
 import "../stylesheets/Dashboard.css";
 import { jwtDecode } from "jwt-decode";
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 
-export default function Dashboard() {
-  const [user, setUser] = useState([]);
-
-  const decodeUser = () => {
-    const token = localStorage.getItem("token");
-    const User = jwtDecode(token);
-    const parsedUser = JSON.parse(User.user);
-    setUser(parsedUser);
-  };
-
+export default function Dashboard({ user }) {
   useEffect(() => {
-    decodeUser();
+    if (window.localStorage) {
+      if (!localStorage.getItem("firstLoad")) {
+        localStorage["firstLoad"] = true;
+        window.location.reload();
+      }
+    }
+    localStorage.removeItem("isInSignInPage");
   }, []);
 
   return (
     <div className="container">
-      <Nav />
+      <Nav user={user.username} />
       <div className="dashboard">
         <div className="header">
           <div className="dosboard-and-search-container">
             <h2 className="--big-h2">DOSBoard</h2>
           </div>
-          <h2 className="--big-h2">Hello, {user.username}!</h2>
+          <h2 className="--big-h2">
+            Hello, <span className="--highlight">{user.username}!</span>
+          </h2>
         </div>
         <div className="posts-announcements-container">
           <Announcements

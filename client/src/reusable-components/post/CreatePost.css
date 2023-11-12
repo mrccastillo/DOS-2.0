@@ -10,14 +10,20 @@
   height: 25rem;
   background-color: #4f709c;
   border-radius: 1rem;
-  padding: 1rem 2rem;
+  padding: 1rem 0rem;
   z-index: 2;
 }
 
 .post-announcement-modal-header {
   text-align: center;
-  height: 3rem;
+  height: 2.7rem;
+  margin-bottom: 0.8rem;
   color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.243);
+}
+
+.post-announcement-modal-content {
+  padding: 0 2rem;
 }
 
 .create-post-announce-content {
@@ -26,11 +32,21 @@
   height: 9rem;
   resize: none;
   padding: 0.5rem;
-  background-color: #ffffff;
+  background-color: rgba(0, 0, 0, 0);
+  border: none;
+  color: white;
+}
+
+.create-post-announce-content::placeholder {
+  color: rgba(255, 255, 255, 0.538);
 }
 
 .create-post-announce-content:focus {
   outline: none;
+}
+
+.btn-container {
+  padding: 0 2rem;
 }
 
 .post-category {

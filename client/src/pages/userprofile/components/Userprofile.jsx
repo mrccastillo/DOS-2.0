@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import { Helmet } from "react-helmet";
 import Post from "../../../reusable-components/post/Post";
 import Announce from "../../../reusable-components/announcement/Announce";
 import Nav from "../../nav/components/Nav";
@@ -9,11 +9,10 @@ import "../stylesheets/Userprofile.css";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
-export default function Userprofile() {
+export default function Userprofile({ userLoggedIn }) {
   const token = localStorage.getItem("token");
   const { username } = useParams();
   const [user, setUser] = useState([]);
-  const [userLoggedIn, setUserLoggedIn] = useState([]);
   const [posts, setPosts] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
@@ -25,27 +24,24 @@ export default function Userprofile() {
   );
 
   const fetchUser = async () => {
-    const user = await axios.get(
-      `https://backend.dosshs.online/api/user?username=${username}`,
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
-    );
-    setUser(user.data.other);
-  };
-
-  const decodeUser = () => {
-    const token = localStorage.getItem("token");
-    const User = jwtDecode(token);
-    const parsedUser = JSON.parse(User.user);
-    setUserLoggedIn(parsedUser);
+    try {
+      const userResponse = await axios.get(
+        `https://backend.dosshs.online/api/user?username=${username}`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      setUser(userResponse.data.other);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
   };
 
   const fetchPosts = async () => {
     try {
-      const announcement = await axios.get(
+      const announcementResponse = await axios.get(
         "https://backend.dosshs.online/api/announcement",
         {
           headers: {
@@ -54,52 +50,19 @@ export default function Userprofile() {
         }
       );
 
-      setAnnouncements(announcement.data);
+      setAnnouncements(announcementResponse.data);
 
-      const post = await axios.get("https://backend.dosshs.online/api/post", {
-        headers: {
-          Authorization: token,
-        },
-      });
-      // const sortedPosts = postsResponse.data.sort(
-      //   (a, b) => new Date(a.dateCreated) - new Date(b.dateCreated)
-      // );
-
-      // const getLikesPromises = sortedPosts.map(async (post) => {
-      //   const likeCountResponse = axios.get(
-      //     `https://backend.dosshs.online/api/post/like/count/${post._id}`,
-      //     {
-      //       headers: {
-      //         Authorization: token,
-      //       },
-      //     }
-      //   );
-
-      //   const commentCountResponse = axios.get(
-      //     `https://backend.dosshs.online/api/post/comment/count/${post._id}`,
-      //     {
-      //       headers: {
-      //         Authorization: token,
-      //       },
-      //     }
-      //   );
-
-      //   const [likeCount, commentCount] = await Promise.all([
-      //     likeCountResponse,
-      //     commentCountResponse,
-      //   ]);
-
-      //   return {
-      //     ...post,
-      //     likeCount: likeCount.data.likeCount,
-      //     commentCount: commentCount.data.commentCount,
-      //   };
-      // });
-
-      // const postsWithCounts = await Promise.all(postsResponse.data);
-      setPosts(post.data);
+      const postResponse = await axios.get(
+        "https://backend.dosshs.online/api/post",
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      setPosts(postResponse.data);
     } catch (error) {
-      return console.error("Error fetching posts:", error);
+      console.error("Error fetching posts:", error);
     }
   };
 
@@ -108,13 +71,30 @@ export default function Userprofile() {
   };
 
   useEffect(() => {
-    fetchUser();
-    decodeUser();
-    fetchPosts();
+    let isMounted = true;
+
+    const fetchData = async () => {
+      await fetchUser();
+      if (isMounted) {
+        fetchPosts();
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [username]);
 
   return (
     <>
+      <Helmet>
+        <title>{`DOS - ${user.username}`}</title>
+        <meta property="og:title" content={`${user.fullname}`} />
+        {/* Add other meta tags as needed */}
+      </Helmet>
+
       <div className="container">
         <Nav />
         <div className="dashboard --userprofile">

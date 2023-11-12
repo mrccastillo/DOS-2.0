@@ -85,7 +85,7 @@ export default function Home({ fullname, username, userId }) {
             </button>
           </div>
           <div className="posts-list">
-            {posts.map((el) => (
+            {posts.reverse().map((el) => (
               <Post
                 key={el._id}
                 fullname={el.fullname}
