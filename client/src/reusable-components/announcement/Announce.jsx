@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function Announce({ fullname, username, content }) {
   return (
     <div className="post">
@@ -7,7 +9,9 @@ export default function Announce({ fullname, username, content }) {
             <div className="profile-pic"></div>
             <div className="post-author">
               <p className="display-name">{fullname}</p>
-              <p className="username">@{username}</p>
+              <p className="username">
+                <Link to={`/${username}`}>@{username}</Link>
+              </p>
             </div>
           </div>
           <div className="report-post-container"></div>
