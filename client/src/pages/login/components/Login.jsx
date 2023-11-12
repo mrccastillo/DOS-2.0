@@ -8,6 +8,8 @@ export default function Login({ onDecodeUser }) {
   const [isInSignInPage, setIsInSignInPage] = useState(true);
   const [steps, setSteps] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
+  const [signUpBtnMsg, setSignUpBtnMsg] = useState("NEXT");
+  const [loginBtnMsg, setLoginBtnMsg] = useState("LOG IN");
 
   //controlled elements
   //login
@@ -25,16 +27,43 @@ export default function Login({ onDecodeUser }) {
   const [userId, setUserId] = useState("");
   const [code, setCode] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
+
+  function validate_email(email) {
+    let expression = /^[^@]+@\w+(\.\w+)+\w$/;
+    if (expression.test(email) == true) {
+      setErrorMsg("");
+    } else {
+      console.log(false);
+      setErrorMsg("Invalid Email");
+    }
+  }
+
   async function handleSignUpSubmit(e) {
     e.preventDefault();
     if (steps === 0) {
       // console.log(steps);
       setErrorMsg("");
       //don't proceed to next step when form is not filled out
-      if (!email || !username || password !== confirmPass) {
-        if (password !== confirmPass)
-          setErrorMsg("Please confirm your password");
-        else setErrorMsg("Please fill out the fields");
+
+      if (password !== confirmPass) {
+        setErrorMsg("Please confirm your password");
+      }
+      if (password.length < 6) {
+        setErrorMsg("Password should be atleast 6 characters");
+      }
+      if (username.length < 3) {
+        setErrorMsg("Username should be atleast 3 characters");
+      }
+      if (
+        !email ||
+        !username ||
+        password !== confirmPass ||
+        password.length < 6 ||
+        username.length < 3
+      ) {
+        if (!email || !username || !password || !confirmPass) {
+          setErrorMsg("Please fill out the fields");
+        }
         return;
       } else {
         const newUser = {
@@ -42,7 +71,7 @@ export default function Login({ onDecodeUser }) {
           email: email,
           password: password,
         };
-
+        setSignUpBtnMsg("Signing you up...");
         try {
           const res = await axios.post(
             "https://backend.dosshs.online/api/auth/signup",
@@ -54,6 +83,7 @@ export default function Login({ onDecodeUser }) {
           }
         } catch (err) {
           console.error(err);
+          setSignUpBtnMsg("NEXT");
           if (err.response.data.err.keyValue.email)
             return setErrorMsg("Email already in use.");
           else if (err.response.data.err.keyValue.username)
@@ -62,8 +92,19 @@ export default function Login({ onDecodeUser }) {
         }
       }
       setSteps((prevStep) => prevStep + 1);
+      setSignUpBtnMsg("NEXT");
     } else if (steps === 1) {
-      if (!firstName || !lastName) {
+      if (
+        !firstName ||
+        !lastName ||
+        firstName.length < 3 ||
+        lastName.length < 3
+      ) {
+        if (firstName.length < 3 || lastName.length < 3) {
+          setErrorMsg(
+            "First Name and Last Name should be atleast 3 characters"
+          );
+        }
         setErrorMsg("Please fill out the fields");
         return;
       } else {
@@ -72,7 +113,7 @@ export default function Login({ onDecodeUser }) {
           lastname: lastName,
           section: section,
         };
-
+        setSignUpBtnMsg("We're sending you a verification code...");
         try {
           const res = await axios.put(
             `https://backend.dosshs.online/api/user/${userId}`,
@@ -94,18 +135,22 @@ export default function Login({ onDecodeUser }) {
           // localStorage.setItem("token", res.data.token);
           // setIsLoggedIn(true);
         } catch (err) {
+          setSignUpBtnMsg("NEXT");
           setErrorMsg(err);
           return console.error(err);
         }
       }
+      setSignUpBtnMsg("CONFIRM");
     } else if (steps === 2) {
       if (!code) {
         setErrorMsg("Please enter the code sent to your email address");
         return;
       } else if (code !== verificationCode) {
         setErrorMsg("Invalid verification code");
+
         return;
       } else {
+        setSignUpBtnMsg("Creating your account...");
         const verifyRes = await axios.get(`
           https://backend.dosshs.online/api/verify/email?token=${code}
         `);
@@ -125,6 +170,7 @@ export default function Login({ onDecodeUser }) {
       setSection("");
       setCode("");
       setErrorMsg("");
+      setSignUpBtnMsg("NEXT");
     }
   }
 
@@ -141,6 +187,7 @@ export default function Login({ onDecodeUser }) {
     };
 
     try {
+      setLoginBtnMsg("LOGGING IN");
       const res = await axios.post(
         "https://backend.dosshs.online/api/auth/login",
         user
@@ -156,7 +203,12 @@ export default function Login({ onDecodeUser }) {
     setPassword("");
     setIsRememberMe();
     setErrorMsg("");
+    setLoginBtnMsg("LOG IN");
   }
+
+  useEffect(() => {
+    localStorage.setItem("isInSignInPage", isInSignInPage);
+  });
 
   if (isLoggedIn) {
     return <Navigate to="/dashboard" />;
@@ -200,6 +252,7 @@ export default function Login({ onDecodeUser }) {
                           setUsernameOrEmail(e.target.value);
                         }}
                         placeholder="Enter your username or email "
+                        required
                       />
                     )}
                     {!isInSignInPage && (
@@ -229,6 +282,7 @@ export default function Login({ onDecodeUser }) {
                           value={email}
                           onChange={(e) => {
                             setEmail(e.target.value);
+                            validate_email(e.target.value);
                           }}
                           placeholder="Enter your email "
                         />
@@ -369,11 +423,11 @@ export default function Login({ onDecodeUser }) {
               </div>
               {isInSignInPage ? (
                 <button className="--blue-btn" onClick={handleLogInSubmit}>
-                  SIGN IN
+                  {loginBtnMsg}
                 </button>
               ) : (
                 <button className="--blue-btn" onClick={handleSignUpSubmit}>
-                  {steps >= 2 ? "SIGN UP" : "NEXT"}
+                  {signUpBtnMsg}
                 </button>
               )}
             </form>
@@ -404,7 +458,9 @@ export default function Login({ onDecodeUser }) {
             </div>
             <div className="not-signedin-container">
               <p className="not-signedin-container-label">
-                {isInSignInPage && " Not yet joined with DOS?"}
+                {isInSignInPage
+                  ? " Not yet joined with DOS?"
+                  : "Already have an account?"}
               </p>
               <button
                 className="--white-btn"
@@ -421,9 +477,7 @@ export default function Login({ onDecodeUser }) {
                   setErrorMsg("");
                 }}
               >
-                {isInSignInPage
-                  ? " Create an account"
-                  : "Already have an account?"}
+                {isInSignInPage ? " Create an account" : "LOG IN"}
               </button>
             </div>
           </div>

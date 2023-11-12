@@ -13,7 +13,7 @@ export default function Dashboard({ user }) {
         window.location.reload();
       }
     }
-    console.log(user);
+    localStorage.removeItem("isInSignInPage");
   }, []);
 
   return (
@@ -24,7 +24,9 @@ export default function Dashboard({ user }) {
           <div className="dosboard-and-search-container">
             <h2 className="--big-h2">DOSBoard</h2>
           </div>
-          <h2 className="--big-h2">Hello, {user.username}!</h2>
+          <h2 className="--big-h2">
+            Hello, <span className="--highlight">{user.username}!</span>
+          </h2>
         </div>
         <div className="posts-announcements-container">
           <Announcements
