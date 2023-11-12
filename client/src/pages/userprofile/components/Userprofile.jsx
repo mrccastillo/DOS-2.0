@@ -111,7 +111,7 @@ export default function Userprofile() {
     fetchUser();
     decodeUser();
     fetchPosts();
-  }, []);
+  }, [username]);
 
   return (
     <>
@@ -138,7 +138,7 @@ export default function Userprofile() {
                 </h2>
               ) : (
                 <h2 style={{ fontSize: "1.5rem" }}>
-                  {user.username}'s Posts & Announcements
+                  {user.username} Posts & Announcements
                 </h2>
               )}
               {user._id === userLoggedIn._id ? (

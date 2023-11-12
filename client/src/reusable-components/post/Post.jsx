@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./Post.css";
 
 export default function Post({ fullname, username, content, date }) {
@@ -10,7 +11,9 @@ export default function Post({ fullname, username, content, date }) {
             <div className="profile-pic"></div>
             <div className="post-author">
               <p className="display-name">{fullname}</p>
-              <p className="username">@{username}</p>
+              <p className="username">
+                <Link to={`/${username}`}>@{username}</Link>
+              </p>
               <p className="date">{newDate}</p>
             </div>
           </div>
