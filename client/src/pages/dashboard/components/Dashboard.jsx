@@ -4,6 +4,7 @@ import Home from "./Home";
 import "../stylesheets/Dashboard.css";
 import { jwtDecode } from "jwt-decode";
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 
 export default function Dashboard({ user }) {
   useEffect(() => {

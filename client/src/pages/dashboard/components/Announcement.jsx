@@ -20,7 +20,7 @@ export default function Announcements({ fullname, username, userId }) {
         }
       );
 
-      setAnnouncements(announcement.data);
+      setAnnouncements(announcement.data.reverse());
     } catch (error) {
       console.error("Error fetching posts:", error);
     }

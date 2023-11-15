@@ -52,7 +52,7 @@ export default function Home({ fullname, username, userId }) {
       // });
 
       // const postsWithCounts = await Promise.all(postsResponse.data);
-      setPosts(post.data);
+      setPosts(post.data.reverse());
     } catch (error) {
       console.error("Error fetching posts:", error);
     }

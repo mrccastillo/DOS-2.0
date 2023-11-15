@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import "../stylesheets/Nav.css";
-import { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import { useEffect } from "react";
 
 export default function Nav({ user }) {
   const logOut = () => {
@@ -25,8 +24,11 @@ export default function Nav({ user }) {
         <div className="navlinks-container">
           <Link to="/">Dashboard</Link>
           <br />
-          <Link to={`/${user}`}>Profile</Link>
-          {/* <Link to={`/${user.username}`} User Profile </Link> */}
+          {user ? (
+            <Link to={`/${user}`}>Profile</Link>
+          ) : (
+            <Link to={null}>Profile</Link>
+          )}
           <br />
           <Link to="/" onClick={logOut}>
             Log Out

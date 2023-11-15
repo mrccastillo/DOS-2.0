@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import "../stylesheets/Login.css";
 import axios from "axios";
+import { Helmet } from "react-helmet";
 
 export default function Login({ onDecodeUser }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -214,31 +215,126 @@ export default function Login({ onDecodeUser }) {
     return <Navigate to="/dashboard" />;
   } else {
     return (
-      <div className="login-background">
-        <div className="login-page" style={{ position: "relative" }}>
-          <div
-            className="login-form-container"
-            style={{
-              left: isInSignInPage /* && isInDesktop*/ ? 0 : "100%",
-              transform: !isInSignInPage && "translateX(-100%)",
-              position: "absolute",
-              transition: "300ms ease-out ",
-            }}
-          >
-            <form className="login-form">
-              <div className="form-fields-container">
-                <h1 className="form-header">
-                  {isInSignInPage ? "Hello World!" : "Create Account"}
-                </h1>
-                <p className="form-subheader">
-                  {" "}
-                  {isInSignInPage
-                    ? "Sign into your DOS Account"
-                    : "Join DOS Now!"}
-                </p>
-                {steps === 0 ? (
-                  <>
-                    {isInSignInPage && (
+      <>
+        <Helmet>
+          <title>DOS</title>
+          <meta property="og:title" content="Login or Sign up" />
+        </Helmet>
+        <div className="login-background">
+          <div className="login-page" style={{ position: "relative" }}>
+            <div
+              className="login-form-container"
+              style={{
+                left: isInSignInPage /* && isInDesktop*/ ? 0 : "100%",
+                transform: !isInSignInPage && "translateX(-100%)",
+                position: "absolute",
+                transition: "300ms ease-out ",
+              }}
+            >
+              <form className="login-form">
+                <div className="form-fields-container">
+                  <h1 className="form-header">
+                    {isInSignInPage ? "Hello World!" : "Create Account"}
+                  </h1>
+                  <p className="form-subheader">
+                    {" "}
+                    {isInSignInPage
+                      ? "Sign into your DOS Account"
+                      : "Join DOS Now!"}
+                  </p>
+                  {steps === 0 ? (
+                    <>
+                      {isInSignInPage && (
+                        <input
+                          type="text"
+                          className="login-input --white-btn"
+                          style={{
+                            borderColor: "#4f709c",
+                            backgroundColor: "white",
+                            color: "#000",
+                          }}
+                          value={usernameOrEmail}
+                          onChange={(e) => {
+                            setUsernameOrEmail(e.target.value);
+                          }}
+                          placeholder="Enter your username or email "
+                          required
+                        />
+                      )}
+                      {!isInSignInPage && (
+                        <>
+                          <input
+                            type="text"
+                            className="login-input --white-btn"
+                            style={{
+                              borderColor: "#4f709c",
+                              backgroundColor: "white",
+                              color: "#000",
+                            }}
+                            value={username}
+                            onChange={(e) => {
+                              setUsername(e.target.value);
+                            }}
+                            placeholder="Enter your username  "
+                          />
+                          <input
+                            type="text"
+                            className="login-input --white-btn"
+                            style={{
+                              borderColor: "#4f709c",
+                              backgroundColor: "white",
+                              color: "#000",
+                            }}
+                            value={email}
+                            onChange={(e) => {
+                              setEmail(e.target.value);
+                              validate_email(e.target.value);
+                            }}
+                            placeholder="Enter your email "
+                          />
+                        </>
+                      )}
+                      <input
+                        type="password"
+                        className="login-input --white-btn"
+                        style={{
+                          borderColor: "#4f709c",
+                          backgroundColor: "white",
+                          color: "#000",
+                        }}
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (!isInSignInPage) {
+                            if (e.target.value != confirmPass)
+                              setErrorMsg("Password didn't match");
+                            else setErrorMsg("");
+                          }
+                        }}
+                        placeholder="Enter your password"
+                      />
+                      {!isInSignInPage && (
+                        <input
+                          type="text"
+                          className="login-input --white-btn"
+                          style={{
+                            borderColor: "#4f709c",
+                            backgroundColor: "white",
+                            color: "#000",
+                          }}
+                          value={confirmPass}
+                          onChange={(e) => {
+                            setConfirmPass(e.target.value);
+                            if (e.target.value != password)
+                              setErrorMsg("Password didn't match");
+                            else setErrorMsg("");
+                          }}
+                          placeholder="Confirm Password  "
+                        />
+                      )}
+                    </>
+                  ) : steps === 1 ? (
+                    <>
                       <input
                         type="text"
                         className="login-input --white-btn"
@@ -247,16 +343,13 @@ export default function Login({ onDecodeUser }) {
                           backgroundColor: "white",
                           color: "#000",
                         }}
-                        value={usernameOrEmail}
+                        value={firstName}
                         onChange={(e) => {
-                          setUsernameOrEmail(e.target.value);
+                          setFisrtName(e.target.value);
                         }}
-                        placeholder="Enter your username or email "
-                        required
+                        placeholder="First Name"
                       />
-                    )}
-                    {!isInSignInPage && (
-                      <>
+                      {!isInSignInPage && (
                         <input
                           type="text"
                           className="login-input --white-btn"
@@ -265,12 +358,36 @@ export default function Login({ onDecodeUser }) {
                             backgroundColor: "white",
                             color: "#000",
                           }}
-                          value={username}
+                          value={lastName}
                           onChange={(e) => {
-                            setUsername(e.target.value);
+                            setLastName(e.target.value);
                           }}
-                          placeholder="Enter your username  "
+                          placeholder="Last Name"
                         />
+                      )}
+                      <input
+                        type="number"
+                        className="login-input --white-btn"
+                        style={{
+                          borderColor: "#4f709c",
+                          backgroundColor: "white",
+                          color: "#000",
+                        }}
+                        value={section}
+                        onChange={(e) => {
+                          setSection(0);
+                        }}
+                        placeholder="Section"
+                      />
+                    </>
+                  ) : (
+                    steps >= 2 && (
+                      <>
+                        <p className="signin-text">
+                          Enter the code sent to {email}
+                          <br />
+                          to finalize your account.
+                        </p>
                         <input
                           type="text"
                           className="login-input --white-btn"
@@ -279,210 +396,100 @@ export default function Login({ onDecodeUser }) {
                             backgroundColor: "white",
                             color: "#000",
                           }}
-                          value={email}
+                          value={code}
                           onChange={(e) => {
-                            setEmail(e.target.value);
-                            validate_email(e.target.value);
+                            setCode(e.target.value);
                           }}
-                          placeholder="Enter your email "
+                          placeholder="Code"
                         />
                       </>
-                    )}
-                    <input
-                      type="password"
-                      className="login-input --white-btn"
-                      style={{
-                        borderColor: "#4f709c",
-                        backgroundColor: "white",
-                        color: "#000",
-                      }}
-                      value={password}
-                      onChange={(e) => {
-                        setPassword(e.target.value);
-                        if (!isInSignInPage) {
-                          if (e.target.value != confirmPass)
-                            setErrorMsg("Password didn't match");
-                          else setErrorMsg("");
-                        }
-                      }}
-                      placeholder="Enter your password"
-                    />
-                    {!isInSignInPage && (
-                      <input
-                        type="text"
-                        className="login-input --white-btn"
-                        style={{
-                          borderColor: "#4f709c",
-                          backgroundColor: "white",
-                          color: "#000",
-                        }}
-                        value={confirmPass}
-                        onChange={(e) => {
-                          setConfirmPass(e.target.value);
-                          if (e.target.value != password)
-                            setErrorMsg("Password didn't match");
-                          else setErrorMsg("");
-                        }}
-                        placeholder="Confirm Password  "
-                      />
-                    )}
-                  </>
-                ) : steps === 1 ? (
-                  <>
-                    <input
-                      type="text"
-                      className="login-input --white-btn"
-                      style={{
-                        borderColor: "#4f709c",
-                        backgroundColor: "white",
-                        color: "#000",
-                      }}
-                      value={firstName}
-                      onChange={(e) => {
-                        setFisrtName(e.target.value);
-                      }}
-                      placeholder="First Name"
-                    />
-                    {!isInSignInPage && (
-                      <input
-                        type="text"
-                        className="login-input --white-btn"
-                        style={{
-                          borderColor: "#4f709c",
-                          backgroundColor: "white",
-                          color: "#000",
-                        }}
-                        value={lastName}
-                        onChange={(e) => {
-                          setLastName(e.target.value);
-                        }}
-                        placeholder="Last Name"
-                      />
-                    )}
-                    <input
-                      type="number"
-                      className="login-input --white-btn"
-                      style={{
-                        borderColor: "#4f709c",
-                        backgroundColor: "white",
-                        color: "#000",
-                      }}
-                      value={section}
-                      onChange={(e) => {
-                        setSection(0);
-                      }}
-                      placeholder="Section"
-                    />
-                  </>
-                ) : (
-                  steps >= 2 && (
-                    <>
-                      <p className="signin-text">
-                        Enter the code sent to {email}
-                        <br />
-                        to finalize your account.
-                      </p>
-                      <input
-                        type="text"
-                        className="login-input --white-btn"
-                        style={{
-                          borderColor: "#4f709c",
-                          backgroundColor: "white",
-                          color: "#000",
-                        }}
-                        value={code}
-                        onChange={(e) => {
-                          setCode(e.target.value);
-                        }}
-                        placeholder="Code"
-                      />
-                    </>
-                  )
-                )}
-
-                <div className="utils-container">
-                  {isInSignInPage && (
-                    <>
-                      <div>
-                        <input
-                          type="checkbox"
-                          name="isRememberMe"
-                          id="remember-me"
-                          value={isRememberMe}
-                          onChange={(e) => {
-                            setIsRememberMe(e.target.checked);
-                          }}
-                        />
-                        <label htmlFor="remember-me">Remember Me</label>
-                      </div>
-                      <p>Forgot Password</p>
-                    </>
+                    )
                   )}
+
+                  <div className="utils-container">
+                    {isInSignInPage && (
+                      <>
+                        <div>
+                          <input
+                            type="checkbox"
+                            name="isRememberMe"
+                            id="remember-me"
+                            value={isRememberMe}
+                            onChange={(e) => {
+                              setIsRememberMe(e.target.checked);
+                            }}
+                          />
+                          <label htmlFor="remember-me">Remember Me</label>
+                        </div>
+                        <p>Forgot Password</p>
+                      </>
+                    )}
+                  </div>
+                  <p className="--server-msg">{errorMsg}</p>
                 </div>
-                <p className="--server-msg">{errorMsg}</p>
-              </div>
-              {isInSignInPage ? (
-                <button className="--blue-btn" onClick={handleLogInSubmit}>
-                  {loginBtnMsg}
-                </button>
-              ) : (
-                <button className="--blue-btn" onClick={handleSignUpSubmit}>
-                  {signUpBtnMsg}
-                </button>
-              )}
-            </form>
-          </div>
-          <div
-            className="login-message-container"
-            style={{
-              right: isInSignInPage ? 0 : "100%",
-              transform: !isInSignInPage && "translateX(100%)",
-              position: "absolute",
-              transition: "300ms ease-out",
-            }}
-          >
-            <div className="message-container">
-              <h2 className="message-header">
-                {isInSignInPage ? "Welcome Back!" : "Welcome to DOS"}
-              </h2>
-              <p className="message-content">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Voluptate quibusdam quas commodi dolores molestias dignissimos
-                laudantium. Et iste quae sapiente facere. Earum libero placeat
-                quidem officia iste doloribus vero sequi! Quibusdam atque
-                expedita, non fuga, illo tempore minus corrupti sequi voluptatem
-                consequatur tempora exercitationem cum consectetur repudiandae,
-                facere pariatur recusandae earum corporis debitis sint sunt
-                numquam. Eligendi officiis quam debitis.
-              </p>
+                {isInSignInPage ? (
+                  <button className="--blue-btn" onClick={handleLogInSubmit}>
+                    {loginBtnMsg}
+                  </button>
+                ) : (
+                  <button className="--blue-btn" onClick={handleSignUpSubmit}>
+                    {signUpBtnMsg}
+                  </button>
+                )}
+              </form>
             </div>
-            <div className="not-signedin-container">
-              <p className="not-signedin-container-label">
-                {isInSignInPage
-                  ? " Not yet joined with DOS?"
-                  : "Already have an account?"}
-              </p>
-              <button
-                className="--white-btn"
-                onClick={() => {
-                  setIsInSignInPage(!isInSignInPage);
-                  setSteps(0);
-                  setEmail("");
-                  setUsername("");
-                  setPassword("");
-                  setFisrtName("");
-                  setLastName("");
-                  setSection("");
-                  setCode("");
-                  setErrorMsg("");
-                }}
-              >
-                {isInSignInPage ? " Create an account" : "LOG IN"}
-              </button>
+            <div
+              className="login-message-container"
+              style={{
+                right: isInSignInPage ? 0 : "100%",
+                transform: !isInSignInPage && "translateX(100%)",
+                position: "absolute",
+                transition: "300ms ease-out",
+              }}
+            >
+              <div className="message-container">
+                <h2 className="message-header">
+                  {isInSignInPage ? "Welcome Back!" : "Welcome to DOS"}
+                </h2>
+                <p className="message-content">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Voluptate quibusdam quas commodi dolores molestias dignissimos
+                  laudantium. Et iste quae sapiente facere. Earum libero placeat
+                  quidem officia iste doloribus vero sequi! Quibusdam atque
+                  expedita, non fuga, illo tempore minus corrupti sequi
+                  voluptatem consequatur tempora exercitationem cum consectetur
+                  repudiandae, facere pariatur recusandae earum corporis debitis
+                  sint sunt numquam. Eligendi officiis quam debitis.
+                </p>
+              </div>
+              <div className="not-signedin-container">
+                <p className="not-signedin-container-label">
+                  {isInSignInPage
+                    ? " Not yet joined with DOS?"
+                    : "Already have an account?"}
+                </p>
+                <button
+                  className="--white-btn"
+                  onClick={() => {
+                    setIsInSignInPage(!isInSignInPage);
+                    setSteps(0);
+                    setEmail("");
+                    setUsername("");
+                    setPassword("");
+                    setFisrtName("");
+                    setLastName("");
+                    setSection("");
+                    setCode("");
+                    setErrorMsg("");
+                  }}
+                >
+                  {isInSignInPage ? " Create an account" : "LOG IN"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 }

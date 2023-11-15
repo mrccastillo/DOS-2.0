@@ -37,7 +37,6 @@ export default function CreatePost({
     } catch (e) {
       console.error("error:", e);
     }
-    console.log(post);
   }
 
   function closeModal() {
