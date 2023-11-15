@@ -6,7 +6,7 @@ const cors = require("cors");
 
 //Routes
 //Auth Controller
-const auth = require("./checkAuth");
+const auth = require("./routes/checkAuth");
 
 //Account Routes
 const authRoute = require("./routes/Account/auth");
@@ -37,7 +37,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/verify", verifyRoute);
 app.use("/api/mail", mailRoute);
 //Protected User route
-app.use("/api/users", auth, userRoute);
+app.use("/api/user", auth, userRoute);
 app.use("/api/upload", auth, uploadRoute);
 
 //Content
@@ -48,6 +48,7 @@ app.use("/api/announcement", auth, announcementRoute);
 app.use("/api/search", auth, searchRoute);
 
 //Others
+app.use("/api/jwt", auth, aliveRoute);
 app.use("/api/alive", aliveRoute);
 
 mongoose.connect(process.env.MONGO_URI);

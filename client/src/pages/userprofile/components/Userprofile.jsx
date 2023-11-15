@@ -72,7 +72,7 @@ export default function Userprofile({ userLoggedIn }) {
 
   useEffect(() => {
     let isMounted = true;
-
+    console.log(userLoggedIn);
     const fetchData = async () => {
       await fetchUser();
       if (isMounted) {
@@ -97,7 +97,7 @@ export default function Userprofile({ userLoggedIn }) {
       ) : null}
 
       <div className="container">
-        <Nav />
+        <Nav user={userLoggedIn.username} />
         <div className="dashboard --userprofile">
           <h2 className="--big-h2">Profile</h2>
           <div className="userprofile-container">
@@ -123,7 +123,7 @@ export default function Userprofile({ userLoggedIn }) {
                 </h2>
               )}
               {user._id === userLoggedIn._id ? (
-                <div>
+                <div className="userprofile-createpost-announce-container">
                   <button
                     className="post-btn"
                     style={{ marginRight: "1rem" }}
@@ -131,7 +131,8 @@ export default function Userprofile({ userLoggedIn }) {
                       setIsCreateAnnounceOpen(!isCreateAnnounceOpen);
                     }}
                   >
-                    Make an Announcement
+                    <i className="material-icons">add_circle_outline</i>Make an
+                    Announcement
                   </button>
                   <button
                     className="post-btn"
@@ -139,7 +140,8 @@ export default function Userprofile({ userLoggedIn }) {
                       setIsCreatePostOpen(!isCreatePostOpen);
                     }}
                   >
-                    Post Something
+                    <i className="material-icons">add_circle_outline</i> Post
+                    Something
                   </button>
                 </div>
               ) : null}

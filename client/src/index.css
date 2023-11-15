@@ -15,6 +15,9 @@
   border-radius: 1rem;
 }
 
+body {
+  overflow-y: hidden;
+}
 /* @font-face {
   font-family: Helvetica, sans-serif;
   src: url();
@@ -67,12 +70,17 @@ select:focus {
   height: 2.5rem;
   width: 2.5rem;
   border-radius: 50%;
-  background-color: #0cc0df;
+  background: url(../src/assets/images/userlight.png);
+  background-size: cover;
+  background-color: #ffffff;
   margin-right: 1rem;
 }
 
 .--userprofile-pic {
   position: absolute;
+  background: url(../src/assets/images/userdark.png);
+  background-size: cover;
+  background-color: #ffffff;
   left: 2rem;
   top: 50%;
   transform: translateY(-50%);
@@ -80,6 +88,17 @@ select:focus {
   width: 9rem;
   border: 5px solid rgb(255, 255, 255);
   border-radius: 50%;
+}
+
+.--nav-profile {
+  position: absolute;
+  width: 4rem;
+  height: 4rem;
+  background: url(../src/assets/images/userlight.png);
+  background-size: cover;
+  background-color: #e6d283;
+  margin-right: 0;
+  bottom: 1rem;
 }
 
 .--white-text {

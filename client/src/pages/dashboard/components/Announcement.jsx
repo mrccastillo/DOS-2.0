@@ -50,6 +50,7 @@ export default function Announcements({ fullname, username, userId }) {
                 className="post-btn"
                 onClick={() => setIsCreateAnnounceOpen(!isCreateAnnounceOpen)}
               >
+                <i className=" material-icons">add_circle_outline</i>
                 Make an Announcement
               </button>
             </div>

@@ -3,19 +3,19 @@ const mongoose = require("mongoose");
 const UserSchema = new mongoose.Schema({
   firstname: {
     type: String,
-    required: true,
     min: 2,
     max: 20,
+    index: "text",
   },
   lastname: {
     type: String,
-    required: true,
     min: 2,
     max: 20,
+    index: "text",
   },
   fullname: {
     type: String,
-    required: true,
+    index: "text",
   },
   username: {
     type: String,
@@ -23,6 +23,7 @@ const UserSchema = new mongoose.Schema({
     min: 3,
     max: 20,
     unique: true,
+    index: "text",
   },
   email: {
     type: String,
@@ -56,6 +57,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     min: 1,
     max: 100,
+    index: "text",
   },
   profilepicture: String,
   isAdmin: {

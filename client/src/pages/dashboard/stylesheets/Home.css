@@ -26,8 +26,11 @@
   align-items: center;
 }
 
-.create-post {
+.create-post,
+.create-announcement {
   height: 2rem;
+  display: flex;
+  justify-content: center;
 }
 
 .post-btn {
@@ -35,6 +38,11 @@
   border-radius: 2rem;
   padding: 0.5rem 4rem;
   background-color: #c6cbd3;
+  min-width: 10rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  /* justify-content: spa; */
 }
 
 .posts-list {

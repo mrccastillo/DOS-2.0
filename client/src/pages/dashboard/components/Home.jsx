@@ -81,7 +81,8 @@ export default function Home({ fullname, username, userId }) {
               className="post-btn"
               onClick={() => setIsCreatePostOpen(!isCreatePostOpen)}
             >
-              Post Something
+              <i className="material-icons">add_circle_outline</i> Post
+              Something
             </button>
           </div>
           <div className="posts-list">

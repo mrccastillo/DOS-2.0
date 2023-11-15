@@ -41,6 +41,11 @@
   padding: 1rem;
 }
 
+.userprofile-createpost-announce-container {
+  display: flex;
+  height: 2rem;
+}
+
 .--userprofile {
   overflow-y: scroll;
   padding: 2rem;

@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import "../stylesheets/Nav.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Nav({ user }) {
+  const [isNavLinkOpen, setIsNavLinkOpen] = useState(false);
   const logOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("firstLoad");
@@ -10,6 +11,7 @@ export default function Nav({ user }) {
   };
 
   useEffect(() => {
+    console.log(user);
     if (window.localStorage) {
       if (!localStorage.getItem("firstLoad")) {
         localStorage["firstLoad"] = true;
@@ -21,21 +23,44 @@ export default function Nav({ user }) {
   return (
     <nav className="nav">
       <div className="nav-content-container">
-        <div className="navlinks-container">
-          <Link to="/">Dashboard</Link>
-          <br />
-          {user ? (
-            <Link to={`/${user}`}>Profile</Link>
-          ) : (
-            <Link to={null}>Profile</Link>
-          )}
-          <br />
-          <Link to="/" onClick={logOut}>
-            Log Out
-          </Link>
+        <div className="logo-navlinks">
+          <div className="logo"></div>
+          <div className="navlinks-container">
+            <Link to="/">Dashboard</Link>
+            <br />
+
+            <br />
+          </div>
         </div>
-        <div className="profile-btn-container">
-          <div className="nav-profile-pic"></div>
+        <div
+          className={
+            isNavLinkOpen
+              ? "nav-profile-and-links-container navlink-active"
+              : "nav-profile-and-links-container"
+          }
+        >
+          <div className={isNavLinkOpen ? "links-active" : "links"}>
+            {user ? (
+              <Link to={`/${user}`} className="link">
+                Profile
+              </Link>
+            ) : (
+              <Link to={null}>Profile</Link>
+            )}
+
+            <p className="link">Account Settings</p>
+            <p className="link">Support Devs</p>
+            <Link to="/" onClick={logOut} className="link --logout">
+              Log Out
+            </Link>
+          </div>
+
+          <div
+            className="profile-pic --nav-profile"
+            onClick={() => {
+              setIsNavLinkOpen(!isNavLinkOpen);
+            }}
+          ></div>
         </div>
       </div>
     </nav>

@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 
-export default function Dashboard({ user }) {
+export default function Dashboard({ user, onDecodeUser }) {
   useEffect(() => {
     if (window.localStorage) {
       if (!localStorage.getItem("firstLoad")) {
@@ -19,7 +19,7 @@ export default function Dashboard({ user }) {
 
   return (
     <div className="container">
-      <Nav user={user.username} />
+      <Nav user={user.username} onDecodeUser={onDecodeUser} />
       <div className="dashboard">
         <div className="header">
           <div className="dosboard-and-search-container">
