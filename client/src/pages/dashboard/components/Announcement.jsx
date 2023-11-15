@@ -39,7 +39,10 @@ export default function Announcements({ fullname, username, userId }) {
       <div className="announcement-container">
         <div className="announcement-tab">
           <div className="announcement-header">
-            <p className="announcement-header-text --chip --announce-btn">
+            <p
+              className="announcement-header-text --chip --announce-btn"
+              style={{ cursor: "auto" }}
+            >
               Announcements
             </p>
             {/* ung tatlong tuldok ewan ko kung ano to */}

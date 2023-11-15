@@ -50,7 +50,10 @@
   width: 6rem;
   padding: 1rem;
   border-radius: 1rem;
-  transition: 200ms;
+}
+
+.navlink {
+  cursor: pointer;
 }
 
 .navlink-active {
@@ -63,6 +66,7 @@
 .links {
   opacity: 0;
   height: 0;
+  width: 0;
 }
 
 .links-active {

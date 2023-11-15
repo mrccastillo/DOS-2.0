@@ -22,7 +22,6 @@
 .post-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
   align-items: center;
 }
 
@@ -36,7 +35,7 @@
 .post-btn {
   border: 0;
   border-radius: 2rem;
-  padding: 0.5rem 4rem;
+  padding: 0.5rem 3rem;
   background-color: #c6cbd3;
   min-width: 10rem;
   display: flex;
@@ -47,5 +46,6 @@
 
 .posts-list {
   width: 100%;
-  padding: 1.5rem;
+  padding: 2rem;
+  padding-top: 0.7rem;
 }

@@ -55,12 +55,13 @@ a {
   white-space: nowrap;
   margin-right: 1rem;
   transition: 100ms;
+  cursor: pointer;
 }
 
 .active-chip {
   background-color: #565294;
   color: rgb(255, 255, 255);
-  box-shadow: 0 1px 4px 1px #2135556e;
+  /* box-shadow: 0 1px 4px 1px #2135556e; */
 }
 
 .--announce-btn {
@@ -133,7 +134,7 @@ a {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.845);
+  background-color: rgba(0, 0, 0, 0.63);
   backdrop-filter: blur(5px);
   z-index: 1;
   transition: all 0.5s;

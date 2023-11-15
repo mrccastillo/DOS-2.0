@@ -84,7 +84,7 @@ export default function CreatePost({
                   setCategoy(e.target.value);
                 }}
               >
-                <option value="0">DOS is For You!</option>
+                <option value="0">General</option>
                 <option value="1">PUP</option>
                 <option value="2">Question</option>
                 <option value="3">Rant</option>
