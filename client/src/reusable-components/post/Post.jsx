@@ -1,7 +1,14 @@
 import { Link } from "react-router-dom";
 import "./Post.css";
 
-export default function Post({ fullname, username, content, date }) {
+export default function Post({
+  fullname,
+  username,
+  content,
+  date,
+  category,
+  isAnonymous,
+}) {
   const newDate = date.slice(0, 10);
   return (
     <div className="post">
@@ -10,9 +17,11 @@ export default function Post({ fullname, username, content, date }) {
           <div className="post-author-info">
             <div className="profile-pic"></div>
             <div className="post-author">
-              <p className="display-name">{fullname}</p>
+              <p className="display-name">
+                {isAnonymous ? "Anonymous" : fullname}
+              </p>
               <p className="username">
-                <Link to={`/${username}`}>@{username}</Link>
+                {!isAnonymous && <Link to={`/${username}`}>@{username}</Link>}
               </p>
               <p className="date">{newDate}</p>
             </div>
@@ -20,6 +29,16 @@ export default function Post({ fullname, username, content, date }) {
           <div className="report-post-container"></div>
         </div>
         <div className="post-content">
+          <p className="category">
+            #
+            {category === 0
+              ? "General"
+              : category === 1
+              ? "PUP"
+              : category === 2
+              ? "Question"
+              : category === 3 && "Rant"}
+          </p>
           <p>{content}</p>
         </div>
       </div>

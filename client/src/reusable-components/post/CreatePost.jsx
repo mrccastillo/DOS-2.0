@@ -10,7 +10,9 @@ export default function CreatePost({
   onModalClose,
 }) {
   const [content, setContent] = useState("");
+  const [category, setCategoy] = useState(0);
   const [isPosting, setIsPosting] = useState("Post");
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   async function handlePostSubmit(e) {
     setIsPosting("Post");
@@ -19,8 +21,9 @@ export default function CreatePost({
       userId: userId,
       username: username,
       fullname: fullname,
-      title: "testtitle",
       content: content,
+      category: category,
+      isAnonymous: isAnonymous,
       dateCreated: Date.now(),
     };
 
@@ -75,14 +78,27 @@ export default function CreatePost({
               }}
             ></textarea>
             <div className="post-category">
-              <select className="select">
-                <option value="">General</option>
-                <option value="">PUP</option>
-                <option value="">Question</option>
-                <option value="">Rant</option>
+              <select
+                className="select"
+                onClick={(e) => {
+                  setCategoy(e.target.value);
+                }}
+              >
+                <option value="0">DOS is For You!</option>
+                <option value="1">PUP</option>
+                <option value="2">Question</option>
+                <option value="3">Rant</option>
               </select>
               <div className="anonymous-btn">
-                <input type="checkbox" id="isAnonymous" />
+                <input
+                  type="checkbox"
+                  id="isAnonymous"
+                  value={isAnonymous}
+                  onClick={(e) => {
+                    setIsAnonymous(e.target.checked);
+                    console.log(isAnonymous);
+                  }}
+                />
                 <label htmlFor="isAnonymous">Post Anonymously</label>
               </div>
             </div>

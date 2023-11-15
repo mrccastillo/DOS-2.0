@@ -170,6 +170,8 @@ export default function Userprofile({ userLoggedIn }) {
                       username={filteredPost.username}
                       content={filteredPost.content}
                       date={filteredPost.dateCreated}
+                      category={filteredPost.category}
+                      isAnonymous={filteredPost.isAnonymous}
                     />
                   ))
                 ) : (

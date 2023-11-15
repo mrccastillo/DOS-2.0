@@ -35,6 +35,10 @@ select:focus {
   outline: 0;
 }
 
+a {
+  color: black;
+}
+
 .--big-h2 {
   font-size: 2.3rem;
   text-shadow: 2px 2px #00000055;
@@ -50,6 +54,13 @@ select:focus {
   font-weight: 500;
   white-space: nowrap;
   margin-right: 1rem;
+  transition: 100ms;
+}
+
+.active-chip {
+  background-color: #565294;
+  color: rgb(255, 255, 255);
+  box-shadow: 0 1px 4px 1px #2135556e;
 }
 
 .--announce-btn {
@@ -107,6 +118,13 @@ select:focus {
 
 .username {
   font-weight: 500;
+}
+
+.category {
+  font-style: italic;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
 }
 
 .overlay {

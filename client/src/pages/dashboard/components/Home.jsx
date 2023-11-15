@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 export default function Home({ fullname, username, userId }) {
   const [posts, setPosts] = useState([]);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+  const [postFilter, setPostFilter] = useState();
 
   const fetchPosts = async () => {
     try {
@@ -64,16 +65,60 @@ export default function Home({ fullname, username, userId }) {
 
   useEffect(() => {
     fetchPosts();
+    console.log(posts);
   }, []);
 
   return (
     <>
       <div className="home-container">
         <div className="filter-container">
-          <span className="--chip">DOS is For You!</span>
-          <span className="--chip">General</span>
-          <span className="--chip">PUP</span>
-          <span className="--chip">Rant</span>
+          <span
+            className={
+              postFilter === undefined ? "--chip active-chip" : "--chip"
+            }
+            onClick={() => {
+              setPostFilter();
+              console.log(postFilter);
+            }}
+          >
+            DOS is For You!
+          </span>
+          <span
+            className={postFilter === 0 ? "--chip active-chip" : "--chip"}
+            onClick={() => {
+              setPostFilter(0);
+              console.log(postFilter);
+            }}
+          >
+            General
+          </span>
+          <span
+            className={postFilter === 1 ? "--chip active-chip" : "--chip"}
+            onClick={() => {
+              setPostFilter(1);
+              console.log(postFilter);
+            }}
+          >
+            PUP
+          </span>
+          <span
+            className={postFilter === 2 ? "--chip active-chip" : "--chip"}
+            onClick={() => {
+              setPostFilter(2);
+              console.log(postFilter);
+            }}
+          >
+            Question
+          </span>
+          <span
+            className={postFilter === 3 ? "--chip active-chip" : "--chip"}
+            onClick={() => {
+              setPostFilter(3);
+              console.log(postFilter);
+            }}
+          >
+            Rant
+          </span>
         </div>
         <div className="post-container">
           <div className="create-post">
@@ -86,15 +131,48 @@ export default function Home({ fullname, username, userId }) {
             </button>
           </div>
           <div className="posts-list">
-            {posts.map((el) => (
-              <Post
-                key={el._id}
-                fullname={el.fullname}
-                username={el.username}
-                content={el.content}
-                date={el.dateCreated}
-              />
-            ))}
+            {/* {posts
+              .filter(
+                (el) => postFilter === undefined || el.category === postFilter
+              )
+              .map((el) => {
+                <Post
+                  key={el._id}
+                  fullname={el.fullname}
+                  username={el.username}
+                  content={el.content}
+                  date={el.dateCreated}
+                  category={el.category}
+                  isAnonymous={el.isAnonymous}
+                />;
+              })} */}
+            <div className="posts-list">
+              {postFilter === undefined
+                ? posts.map((el) => (
+                    <Post
+                      key={el._id}
+                      fullname={el.fullname}
+                      username={el.username}
+                      content={el.content}
+                      date={el.dateCreated}
+                      category={el.category}
+                      isAnonymous={el.isAnonymous}
+                    />
+                  ))
+                : posts
+                    .filter((el) => el.category === postFilter)
+                    .map((el) => (
+                      <Post
+                        key={el._id}
+                        fullname={el.fullname}
+                        username={el.username}
+                        content={el.content}
+                        date={el.dateCreated}
+                        category={el.category}
+                        isAnonymous={el.isAnonymous}
+                      />
+                    ))}
+            </div>
           </div>
         </div>
       </div>
