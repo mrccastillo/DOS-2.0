@@ -59,9 +59,9 @@ a {
 }
 
 .active-chip {
-  background-color: #565294;
-  color: rgb(255, 255, 255);
-  /* box-shadow: 0 1px 4px 1px #2135556e; */
+  background-color: #e6d283;
+  /* background-color: #565294; */
+  color: rgb(0, 0, 0);
 }
 
 .--announce-btn {
