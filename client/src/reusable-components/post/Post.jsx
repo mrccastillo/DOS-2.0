@@ -21,7 +21,9 @@ export default function Post({
                 {isAnonymous ? "Anonymous" : fullname}
               </p>
               <p className="username">
-                {!isAnonymous && <Link to={`/${username}`}>@{username}</Link>}
+                {!isAnonymous && (
+                  <Link to={`/user/${username}`}>@{username}</Link>
+                )}
               </p>
               <p className="date">{newDate}</p>
             </div>

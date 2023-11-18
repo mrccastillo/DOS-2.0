@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/dashboard/components/Dashboard";
 import Userprofile from "./pages/userprofile/components/Userprofile";
 import Login from "./pages/login/components/Login";
+import Error404 from "./pages/pagenotfound/components/Error404";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
@@ -62,9 +63,10 @@ function App() {
           element={token ? <Dashboard user={user} /> : <Login />}
         />
         <Route
-          path="/:username"
+          path="/user/:username"
           element={token ? <Userprofile userLoggedIn={user} /> : <Login />}
         />
+        <Route path="*" element={<Error404 />} />
       </Routes>
     </Router>
   );
