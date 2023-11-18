@@ -25,6 +25,23 @@ export default function Userprofile({ userLoggedIn }) {
 
   const fetchUser = async () => {
     try {
+      const userValid = await axios.get(
+        `https://backend.dosshs.online/api/user/find?account=${username}`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+    } catch (err) {
+      if (err.response.data.message == "User not found") {
+        return (location.href = "/");
+      } else {
+        return console.error(err);
+      }
+    }
+
+    try {
       const userResponse = await axios.get(
         `https://backend.dosshs.online/api/user?username=${username}`,
         {
@@ -72,7 +89,7 @@ export default function Userprofile({ userLoggedIn }) {
 
   useEffect(() => {
     let isMounted = true;
-    console.log(userLoggedIn);
+    // console.log(userLoggedIn);
     const fetchData = async () => {
       await fetchUser();
       if (isMounted) {
@@ -158,24 +175,34 @@ export default function Userprofile({ userLoggedIn }) {
                     />
                   ))
                 ) : (
-                  <p className="empty">You haven't created announcement yet</p>
+                  <p className="empty">
+                    {userLoggedIn.username === username
+                      ? "You haven't announced anything yet"
+                      : `${username} haven't announced anything yet`}
+                  </p>
                 )}
               </div>
               <div className="user-post">
                 {filteredPosts.length > 0 ? (
-                  filteredPosts.map((filteredPost) => (
-                    <Post
-                      key={filteredPost._id}
-                      fullname={filteredPost.fullname}
-                      username={filteredPost.username}
-                      content={filteredPost.content}
-                      date={filteredPost.dateCreated}
-                      category={filteredPost.category}
-                      isAnonymous={filteredPost.isAnonymous}
-                    />
-                  ))
+                  filteredPosts
+                    .filter((filteredPost) => !filteredPost.isAnonymous)
+                    .map((filteredPost) => (
+                      <Post
+                        key={filteredPost._id}
+                        fullname={filteredPost.fullname}
+                        username={filteredPost.username}
+                        content={filteredPost.content}
+                        date={filteredPost.dateCreated}
+                        category={filteredPost.category}
+                        isAnonymous={filteredPost.isAnonymous}
+                      />
+                    ))
                 ) : (
-                  <p className="empty">You haven't posted anything</p>
+                  <p className="empty">
+                    {userLoggedIn.username === username
+                      ? "You haven't posted anything yet"
+                      : `${username} haven't posted anything yet`}
+                  </p>
                 )}
               </div>
             </div>

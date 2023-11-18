@@ -65,7 +65,7 @@ export default function Home({ fullname, username, userId }) {
 
   useEffect(() => {
     fetchPosts();
-    console.log(posts);
+    // console.log(posts);
   }, []);
 
   return (
@@ -78,7 +78,7 @@ export default function Home({ fullname, username, userId }) {
             }
             onClick={() => {
               setPostFilter();
-              console.log(postFilter);
+              // console.log(postFilter);
             }}
           >
             DOS is For You!
@@ -87,7 +87,7 @@ export default function Home({ fullname, username, userId }) {
             className={postFilter === 0 ? "--chip active-chip" : "--chip"}
             onClick={() => {
               setPostFilter(0);
-              console.log(postFilter);
+              // console.log(postFilter);
             }}
           >
             General
@@ -96,7 +96,7 @@ export default function Home({ fullname, username, userId }) {
             className={postFilter === 1 ? "--chip active-chip" : "--chip"}
             onClick={() => {
               setPostFilter(1);
-              console.log(postFilter);
+              // console.log(postFilter);
             }}
           >
             PUP
@@ -105,7 +105,7 @@ export default function Home({ fullname, username, userId }) {
             className={postFilter === 2 ? "--chip active-chip" : "--chip"}
             onClick={() => {
               setPostFilter(2);
-              console.log(postFilter);
+              // console.log(postFilter);
             }}
           >
             Question
@@ -114,7 +114,7 @@ export default function Home({ fullname, username, userId }) {
             className={postFilter === 3 ? "--chip active-chip" : "--chip"}
             onClick={() => {
               setPostFilter(3);
-              console.log(postFilter);
+              // console.log(postFilter);
             }}
           >
             Rant

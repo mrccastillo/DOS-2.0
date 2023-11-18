@@ -5,8 +5,11 @@ import axios from "axios";
 import { Helmet } from "react-helmet";
 
 export default function Login({ onDecodeUser }) {
+  const storedValue = localStorage.getItem("isInSignInPage");
+  const [isInSignInPage, setIsInSignInPage] = useState(
+    storedValue === null ? true : JSON.parse(storedValue)
+  );
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isInSignInPage, setIsInSignInPage] = useState(true);
   const [steps, setSteps] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
   const [signUpBtnMsg, setSignUpBtnMsg] = useState("NEXT");
@@ -24,7 +27,7 @@ export default function Login({ onDecodeUser }) {
   const [confirmPass, setConfirmPass] = useState("");
   const [firstName, setFisrtName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [section, setSection] = useState(0);
+  const [section, setSection] = useState();
   const [userId, setUserId] = useState("");
   const [code, setCode] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
@@ -32,39 +35,44 @@ export default function Login({ onDecodeUser }) {
   function validate_email(email) {
     let expression = /^[^@]+@\w+(\.\w+)+\w$/;
     if (expression.test(email) == true) {
-      setErrorMsg("");
+      return true;
     } else {
-      console.log(false);
-      setErrorMsg("Invalid Email");
+      return false;
     }
   }
 
   async function handleSignUpSubmit(e) {
     e.preventDefault();
     if (steps === 0) {
-      // console.log(steps);
       setErrorMsg("");
       //don't proceed to next step when form is not filled out
 
-      if (password !== confirmPass) {
-        setErrorMsg("Please confirm your password");
-      }
-      if (password.length < 6) {
-        setErrorMsg("Password should be atleast 6 characters");
-      }
-      if (username.length < 3) {
-        setErrorMsg("Username should be atleast 3 characters");
-      }
-      if (
-        !email ||
-        !username ||
-        password !== confirmPass ||
-        password.length < 6 ||
-        username.length < 3
+      if (!email || !username || !password || !confirmPass) {
+        setErrorMsg("Please fill out the fields.");
+        return;
+      } else if (
+        username === "admin" ||
+        username === "Admin" ||
+        username === "dashboard" ||
+        username === "Dashboard" ||
+        username === "dosboard" ||
+        username === "Dosboard" ||
+        username === "login" ||
+        username === "Login"
       ) {
-        if (!email || !username || !password || !confirmPass) {
-          setErrorMsg("Please fill out the fields");
-        }
+        setErrorMsg("Invalid Username");
+        return;
+      } else if (!validate_email(email)) {
+        setErrorMsg("Invalid Email");
+        return;
+      } else if (password.length < 6) {
+        setErrorMsg("Password should be atleast 6 characters.");
+        return;
+      } else if (username.length < 3) {
+        setErrorMsg("Username should be atleast 3 characters.");
+        return;
+      } else if (password !== confirmPass) {
+        setErrorMsg("Password didn't match.");
         return;
       } else {
         const newUser = {
@@ -95,26 +103,20 @@ export default function Login({ onDecodeUser }) {
       setSteps((prevStep) => prevStep + 1);
       setSignUpBtnMsg("NEXT");
     } else if (steps === 1) {
-      if (
-        !firstName ||
-        !lastName ||
-        firstName.length < 3 ||
-        lastName.length < 3
-      ) {
-        if (firstName.length < 3 || lastName.length < 3) {
-          setErrorMsg(
-            "First Name and Last Name should be atleast 3 characters"
-          );
-        }
-        setErrorMsg("Please fill out the fields");
-        return;
+      console.log(section);
+      if (!firstName || !lastName || section === undefined)
+        return setErrorMsg("Please fill out the fields");
+      else if (firstName.length < 2 || lastName.length < 2) {
+        return setErrorMsg(
+          "First Name and Last Name should be atleast 2 characters"
+        );
       } else {
         const user = {
           firstname: firstName,
           lastname: lastName,
           section: section,
         };
-        setSignUpBtnMsg("We're sending you a verification code...");
+        setSignUpBtnMsg("Sending you a code...");
         try {
           const res = await axios.put(
             `https://backend.dosshs.online/api/user/${userId}`,
@@ -209,10 +211,10 @@ export default function Login({ onDecodeUser }) {
 
   useEffect(() => {
     localStorage.setItem("isInSignInPage", isInSignInPage);
-  });
+  }, [isInSignInPage]);
 
   if (isLoggedIn) {
-    return <Navigate to="/dashboard" />;
+    return (location.href = "/");
   } else {
     return (
       <>
@@ -288,7 +290,6 @@ export default function Login({ onDecodeUser }) {
                             value={email}
                             onChange={(e) => {
                               setEmail(e.target.value);
-                              validate_email(e.target.value);
                             }}
                             placeholder="Enter your email "
                           />
@@ -305,11 +306,6 @@ export default function Login({ onDecodeUser }) {
                         value={password}
                         onChange={(e) => {
                           setPassword(e.target.value);
-                          if (!isInSignInPage) {
-                            if (e.target.value != confirmPass)
-                              setErrorMsg("Password didn't match");
-                            else setErrorMsg("");
-                          }
                         }}
                         placeholder="Enter your password"
                       />
@@ -325,9 +321,6 @@ export default function Login({ onDecodeUser }) {
                           value={confirmPass}
                           onChange={(e) => {
                             setConfirmPass(e.target.value);
-                            if (e.target.value != password)
-                              setErrorMsg("Password didn't match");
-                            else setErrorMsg("");
                           }}
                           placeholder="Confirm Password  "
                         />
@@ -365,9 +358,8 @@ export default function Login({ onDecodeUser }) {
                           placeholder="Last Name"
                         />
                       )}
-                      <input
-                        type="number"
-                        className="login-input --white-btn"
+                      <select
+                        className="select login-input --white-btn"
                         style={{
                           borderColor: "#4f709c",
                           backgroundColor: "white",
@@ -375,10 +367,14 @@ export default function Login({ onDecodeUser }) {
                         }}
                         value={section}
                         onChange={(e) => {
-                          setSection(0);
+                          setSection(e.target.value);
+                          console.log(e.target.value);
                         }}
-                        placeholder="Section"
-                      />
+                      >
+                        <option value={null}>Section</option>
+                        <option value={1}>ICT 12 - 1</option>
+                        <option value={2}>ICT 12 - 2</option>
+                      </select>
                     </>
                   ) : (
                     steps >= 2 && (

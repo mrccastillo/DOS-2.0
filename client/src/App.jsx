@@ -53,8 +53,14 @@ function App() {
           path="/"
           element={token ? <Dashboard user={user} /> : <Login />}
         ></Route>
-        <Route path="/dashboard" element={<Dashboard user={user} />} />
-        <Route path="/dosboard" element={<Dashboard user={user} />} />
+        <Route
+          path="/dashboard"
+          element={token ? <Dashboard user={user} /> : <Login />}
+        />
+        <Route
+          path="/dosboard"
+          element={token ? <Dashboard user={user} /> : <Login />}
+        />
         <Route
           path="/:username"
           element={token ? <Userprofile userLoggedIn={user} /> : <Login />}

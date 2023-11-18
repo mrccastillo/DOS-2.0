@@ -96,7 +96,7 @@ export default function CreatePost({
                   value={isAnonymous}
                   onClick={(e) => {
                     setIsAnonymous(e.target.checked);
-                    console.log(isAnonymous);
+                    // console.log(isAnonymous);
                   }}
                 />
                 <label htmlFor="isAnonymous">Post Anonymously</label>

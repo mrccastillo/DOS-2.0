@@ -11,7 +11,7 @@ export default function Nav({ user }) {
   };
 
   useEffect(() => {
-    console.log(user);
+    // console.log(user);
     if (window.localStorage) {
       if (!localStorage.getItem("firstLoad")) {
         localStorage["firstLoad"] = true;
